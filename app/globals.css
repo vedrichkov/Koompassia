@@ -1,0 +1,185 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand tokens */
+  --cream: #F8EFED;
+  --cream-2: #F1DEDF;
+  --paper: #FDF8F7;
+  --ink: #1F1718;
+  --ink-soft: #5C5052;
+  --ink-faint: #938587;
+  --line: #EFDADC;
+  --line-soft: #F4E6E7;
+  --bark: #2A2122;
+  --bark-deep: #19110F;
+  --amber: #D77E91;
+  --amber-soft: #F2C3CE;
+  --sage: #C98EA3;
+  --clay: #B05E76;
+  --gold: #E5A6B5;
+
+  /* Shadows */
+  --shadow: 0 1px 2px rgba(43, 30, 33, 0.05), 0 8px 28px rgba(43, 30, 33, 0.07);
+  --shadow-lg: 0 2px 6px rgba(43, 30, 33, 0.06), 0 24px 60px rgba(43, 30, 33, 0.12);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    color: var(--ink);
+    background: var(--cream);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: clip;
+  }
+
+  /* Ambient layered background, fixed behind everything */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(900px 600px at 12% -5%, rgba(215, 126, 145, 0.12), transparent 60%),
+      radial-gradient(800px 700px at 100% 8%, rgba(242, 195, 206, 0.30), transparent 55%),
+      radial-gradient(700px 600px at 50% 110%, rgba(176, 94, 118, 0.08), transparent 60%),
+      var(--cream);
+  }
+
+  /* Subtle paper grain — very faint, hand-built feel */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.65  0 0 0 0 0.55  0 0 0 0 0.55  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  ::selection {
+    background: var(--amber-soft);
+    color: var(--bark-deep);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 1.5px solid var(--clay);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  .serif {
+    font-family: var(--font-serif), Georgia, serif;
+    font-feature-settings: "ss01", "ss02";
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: 28px;
+  }
+
+  @media (max-width: 640px) {
+    .shell {
+      padding-inline: 20px;
+    }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Hairline gradient divider */
+  .hairline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line), transparent);
+  }
+
+  /* Spotlight card top bar */
+  .spotlight-bar {
+    background: linear-gradient(90deg, var(--amber), var(--gold), var(--sage));
+  }
+
+  /* Warm-dark CTA gradient */
+  .bark-gradient {
+    background: linear-gradient(165deg, var(--bark-deep) 0%, var(--bark) 55%, #5e3744 100%);
+  }
+
+  /* Entrance — CSS animation, SSR-safe. Element is visible by default;
+     the animation runs from a slightly faded/offset state to its natural state. */
+  .reveal {
+    animation: reveal-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SVG path stroke draw-in via CSS — works without JS. */
+  .spark-line {
+    stroke-dasharray: 360;
+    stroke-dashoffset: 360;
+    animation: spark-draw 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+  }
+
+  .chart-line {
+    stroke-dasharray: 480;
+    stroke-dashoffset: 480;
+    animation: chart-draw 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+  }
+
+  .chart-line--practice {
+    animation-delay: 0.7s;
+    animation-duration: 2s;
+  }
+
+  .chart-area {
+    opacity: 0;
+    animation: fade-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+  }
+
+  @keyframes spark-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes chart-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes fade-in {
+    to { opacity: 1; }
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

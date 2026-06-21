@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Koompassia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cream:#F8EFED;
+    --ink:#1F1718;
+    --ink-soft:#5C5052;
+    --ink-faint:#938587;
+    --clay:#B05E76;
+    --line:#EFDADC;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--cream);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    line-height:1.5;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Nav ---------- */
+  .nav{
+    position:absolute; top:0; left:0; right:0; z-index:10;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:32px 40px;
+  }
+  .brand{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:500;
+    font-size:20px;
+    letter-spacing:-0.01em;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  .nav-cta{
+    font-size:14px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    transition:color 300ms ease;
+  }
+  .nav-cta:hover{color:var(--clay)}
+  @media (max-width:640px){
+    .nav{padding:24px 24px}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column;
+    justify-content:flex-end;
+    align-items:center;
+    padding:0 40px 96px;
+    overflow:hidden;
+  }
+  @media (max-width:640px){
+    .hero{padding:0 24px 72px}
+  }
+
+  /* ---------- The form (single signature element) ---------- */
+  .form-wrap{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%, -54%);
+    width:min(120vw, 1300px);
+    aspect-ratio:5 / 4;
+    pointer-events:none;
+    z-index:1;
+    opacity:0;
+    animation:formIn 2400ms cubic-bezier(0.22, 1, 0.36, 1) 200ms forwards,
+              breathe 10s ease-in-out 2.6s infinite;
+    will-change:transform, opacity;
+  }
+  .form-rotate{
+    width:100%; height:100%;
+    animation:rotate 90s linear 2.6s infinite;
+    will-change:transform;
+  }
+  .form-svg{ width:100%; height:100%; display:block }
+
+  @keyframes formIn{
+    0%   { opacity:0; transform:translate(-50%,-50%) scale(.96) }
+    100% { opacity:1; transform:translate(-50%,-54%) scale(1) }
+  }
+  @keyframes breathe{
+    0%,100% { transform:translate(-50%, -54%) scale(1) }
+    50%     { transform:translate(-50%, -54%) scale(1.04) }
+  }
+  @keyframes rotate{
+    to { transform:rotate(360deg) }
+  }
+
+  @media (max-width:640px){
+    .form-wrap{
+      width:min(160vw, 700px);
+      transform:translate(-50%, -58%);
+    }
+    @keyframes formIn{
+      0%   { opacity:0; transform:translate(-50%,-54%) scale(.96) }
+      100% { opacity:1; transform:translate(-50%,-58%) scale(1) }
+    }
+    @keyframes breathe{
+      0%,100% { transform:translate(-50%, -58%) scale(1) }
+      50%     { transform:translate(-50%, -58%) scale(1.04) }
+    }
+  }
+
+  /* ---------- Copy ---------- */
+  .copy{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    max-width:640px;
+    opacity:0;
+    transform:translateY(12px);
+    animation:copyIn 2200ms cubic-bezier(0.22, 1, 0.36, 1) 1800ms forwards;
+  }
+  @keyframes copyIn{
+    to { opacity:1; transform:translateY(0) }
+  }
+
+  .lede{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:400;
+    font-size:clamp(22px, 2.6vw, 32px);
+    line-height:1.35;
+    letter-spacing:-0.015em;
+    color:var(--ink);
+    margin-bottom:48px;
+    text-wrap:balance;
+  }
+
+  .actions{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .download{
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    text-decoration:none;
+    padding:4px 0;
+    position:relative;
+    transition:color 300ms ease;
+  }
+  .download::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:1px;
+    background:var(--ink);
+    transform-origin:left;
+    transition:transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+               background 300ms ease;
+  }
+  .download:hover{color:var(--clay)}
+  .download:hover::after{background:var(--clay)}
+  .actions .sub{
+    font-size:13px;
+    color:var(--ink-faint);
+    letter-spacing:0.01em;
+  }
+
+  a:focus-visible{
+    outline:1.5px solid var(--clay);
+    outline-offset:6px;
+    border-radius:2px;
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    .form-wrap, .form-rotate, .copy{
+      animation:none !important;
+      opacity:1 !important;
+      transform:translate(-50%, -54%) !important;
+    }
+    .form-rotate{ transform:none !important }
+    .copy{ transform:none !important }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="#">Koompassia</a>
+  <a class="nav-cta" href="#get">Download</a>
+</header>
+
+<main>
+  <section class="hero">
+
+    <div class="form-wrap" aria-hidden="true">
+      <div class="form-rotate">
+        <svg class="form-svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="clayForm" cx="48%" cy="44%" r="55%" fx="46%" fy="42%">
+              <stop offset="0%"   stop-color="#B05E76" stop-opacity="0.95"/>
+              <stop offset="38%"  stop-color="#B05E76" stop-opacity="0.62"/>
+              <stop offset="72%"  stop-color="#B05E76" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#B05E76" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="500" cy="400" rx="470" ry="360" fill="url(#clayForm)"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="copy">
+      <p class="lede">
+        Koompassia reads your nervous system and hands you the one thing that helps, right when it will.
+      </p>
+      <div class="actions">
+        <a class="download" href="#get">Download for iPhone</a>
+        <span class="sub">Free with Apple Watch.</span>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+</body>
+</html>
