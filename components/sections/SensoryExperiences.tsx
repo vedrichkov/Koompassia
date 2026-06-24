@@ -3,31 +3,45 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
+import { cn } from "@/lib/cn";
 
-const experiences = [
+type Experience = {
+  name: string;
+  body: string;
+  canvas: React.ReactNode;
+  /** Tailwind classes for desktop column-span + aspect + translate-y offset */
+  layoutClass: string;
+  /** Aspect ratio class for the canvas frame */
+  canvasAspect: string;
+};
+
+const experiences: Experience[] = [
   {
     name: "Still Water",
     body: "Stillness, steady breath, soft visual feedback. As you stay composed, the water settles and clarity emerges.",
     canvas: <StillWaterCanvas />,
-    tone: "calm",
+    layoutClass: "md:col-span-5",
+    canvasAspect: "aspect-[3/4]",
   },
   {
     name: "Cosmic Breath",
     body: "Rhythmic breathing gradually builds a living visual structure. Breathwork made immersive and rewarding.",
     canvas: <CosmicBreathCanvas />,
-    tone: "deep",
+    layoutClass: "md:col-span-4 md:translate-y-20",
+    canvasAspect: "aspect-square",
   },
   {
     name: "Axis",
     body: "Attention and control through motion, rhythm, composure. Guide an orbiting path with precision.",
     canvas: <AxisCanvas />,
-    tone: "focus",
+    layoutClass: "md:col-span-3 md:-translate-y-10",
+    canvasAspect: "aspect-[4/5]",
   },
 ];
 
 export function SensoryExperiences() {
   return (
-    <section id="experiences" className="relative py-24 md:py-32">
+    <section id="experiences" className="relative py-24 md:py-32 md:pb-44">
       <div className="shell">
         <Reveal as="div" className="max-w-2xl">
           <Eyebrow index="03">Sensory experiences</Eyebrow>
@@ -40,14 +54,24 @@ export function SensoryExperiences() {
           </p>
         </Reveal>
 
-        <ul className="mt-14 grid gap-6 md:grid-cols-3">
+        <ul className="mt-14 grid gap-6 md:mt-20 md:grid-cols-12 md:gap-7">
           {experiences.map((e, i) => (
-            <Reveal as="li" key={e.name} delay={i * 0.08}>
-              <article className="dark-card-lit group relative h-full overflow-hidden rounded-3xl border border-bark-deep/40 p-8 text-paper transition-all duration-500 hover:-translate-y-1">
-                <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+            <Reveal
+              as="li"
+              key={e.name}
+              delay={i * 0.08}
+              className={cn("flex", e.layoutClass)}
+            >
+              <article className="dark-card-lit group relative flex h-full w-full flex-col overflow-hidden rounded-3xl border border-bark-deep/40 p-7 text-paper transition-all duration-500 hover:-translate-y-1 md:p-8">
+                <div
+                  className={cn(
+                    "relative overflow-hidden rounded-2xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+                    e.canvasAspect,
+                  )}
+                >
                   {e.canvas}
                 </div>
-                <div className="mt-7">
+                <div className="mt-7 flex-1">
                   <h3 className="serif text-[22px] font-medium leading-tight tracking-tightish text-paper">
                     {e.name}
                   </h3>
