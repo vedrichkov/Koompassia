@@ -6,6 +6,7 @@ import { MobileBottomCTA } from "@/components/chrome/MobileBottomCTA";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
+import { AmbientCanvas } from "@/components/motion/AmbientCanvas";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -132,6 +133,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <AmbientCanvas />
         <SmoothScroll />
         <ScrollProgress />
         <Nav />

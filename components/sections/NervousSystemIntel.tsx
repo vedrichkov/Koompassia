@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
+import { TRIGGER } from "@/lib/motion-tokens";
 import { IconPulse, IconArchitect, IconCompass } from "@/lib/icons";
 
 const intelligences = [
@@ -104,42 +101,56 @@ export function NervousSystemIntel() {
 
 function PinnedNRS() {
   const stageRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+  const sparkRef = useRef<SVGPathElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: stageRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Score 60 → 82 across the stage
-  const scoreMV = useTransform(scrollYProgress, [0, 1], [60, 82]);
   const [score, setScore] = useState(reduce ? 82 : 60);
-  useMotionValueEvent(scoreMV, "change", (v) => {
-    if (!reduce) setScore(Math.round(v));
-  });
-
-  // Active stage index (0, 1, 2) for the narrative caption + state label.
-  // Function transformer for crisp transitions rather than linear interpolation.
-  const stageMV = useTransform(scrollYProgress, (p) =>
-    p < 0.32 ? 0 : p < 0.66 ? 1 : 2,
-  );
-  const [stageIdx, setStageIdx] = useState(reduce ? 2 : 0);
-  useMotionValueEvent(stageMV, "change", (v) => {
-    if (!reduce) setStageIdx(v as 0 | 1 | 2);
-  });
-
-  // Sparkline draw — 0 (fully drawn) at end of scroll
-  const sparkOffset = useTransform(scrollYProgress, [0, 1], [360, 0]);
-
-  // Subtle glow scales with progress for atmosphere
-  const glowScale = useTransform(scrollYProgress, [0, 1], [0.9, 1.1]);
-  const glowOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.45, 0.8, 1]);
-
-  // HRV trend chip animates from 0 to +4%
-  const hrvTrend = useTransform(scrollYProgress, [0, 1], [0, 4]);
+  const [stageIdx, setStageIdx] = useState<0 | 1 | 2>(reduce ? 2 : 0);
   const [hrvDisplay, setHrvDisplay] = useState(reduce ? 4 : 0);
-  useMotionValueEvent(hrvTrend, "change", (v) => {
-    if (!reduce) setHrvDisplay(Math.round(v));
-  });
+
+  // ScrollTrigger pins the card for one viewport-worth of scroll while
+  // a scrubbed timeline drives the score, stage index, sparkline draw,
+  // and atmospheric glow from scroll progress. scrub:1 matches the
+  // motion-token spec for "1s catch-up smoothing" — essential here so
+  // the number doesn't jitter on raw wheel input.
+  useEffect(() => {
+    if (reduce) return;
+    const section = stageRef.current;
+    const pinned = pinRef.current;
+    if (!section || !pinned) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.set(sparkRef.current, { attr: { "stroke-dashoffset": 360 } });
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: "bottom bottom",
+        pin: pinned,
+        pinSpacing: false,
+        scrub: TRIGGER.scrub,
+        onUpdate: (self) => {
+          const p = self.progress;
+          setScore(Math.round(60 + (82 - 60) * p));
+          setStageIdx((p < 0.32 ? 0 : p < 0.66 ? 1 : 2) as 0 | 1 | 2);
+          setHrvDisplay(Math.round(p * 4));
+          if (sparkRef.current) {
+            sparkRef.current.setAttribute("stroke-dashoffset", String(360 * (1 - p)));
+          }
+          if (glowRef.current) {
+            gsap.set(glowRef.current, {
+              scale: 0.9 + 0.2 * p,
+              opacity: 0.45 + 0.55 * p,
+            });
+          }
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, [reduce]);
 
   const current = stages[stageIdx];
 
@@ -149,19 +160,24 @@ function PinnedNRS() {
       className="relative md:h-[200vh]"
       aria-label="A living score: as you scroll, your Neural Regulation Score rises from 60 to 82, narrating three states."
     >
-      <div className="md:sticky md:top-[88px] md:flex md:h-[calc(100vh-88px)] md:items-center md:py-6">
+      <div
+        ref={pinRef}
+        className="md:flex md:h-screen md:items-center md:py-6"
+      >
         <div className="shell w-full">
           <div className="dark-card-lit relative mx-auto max-w-[920px] overflow-hidden rounded-[28px] border border-bark-deep/40 p-10 text-paper md:p-16">
-            {/* breathing glow */}
-            <motion.div
+            {/* breathing glow — driven by ScrollTrigger onUpdate */}
+            <div
+              ref={glowRef}
               aria-hidden
               className="pointer-events-none absolute -right-24 -top-24 h-[460px] w-[460px] rounded-full"
               style={{
                 background:
                   "radial-gradient(circle, rgba(242,195,206,0.42), rgba(176,94,118,0.18) 45%, transparent 70%)",
                 filter: "blur(40px)",
-                scale: reduce ? 1 : glowScale,
-                opacity: reduce ? 0.8 : glowOpacity,
+                transform: reduce ? "scale(1)" : "scale(0.9)",
+                opacity: reduce ? 0.8 : 0.45,
+                willChange: "transform, opacity",
               }}
             />
 
@@ -230,14 +246,15 @@ function PinnedNRS() {
                   <stop offset="100%" stopColor="#D77E91" stopOpacity="0.0" />
                 </linearGradient>
               </defs>
-              <motion.path
+              <path
+                ref={sparkRef}
                 d="M0 44 C 30 32, 60 56, 90 38 S 150 18, 180 28 S 240 42, 270 22 S 330 8, 360 18"
                 stroke="url(#spark-pin)"
                 strokeWidth="2.2"
                 strokeLinecap="round"
                 fill="none"
                 strokeDasharray="360"
-                style={{ strokeDashoffset: reduce ? 0 : sparkOffset }}
+                strokeDashoffset={reduce ? 0 : 360}
               />
             </svg>
 

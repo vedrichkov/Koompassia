@@ -1,16 +1,16 @@
 "use client";
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   AnimatePresence,
   motion,
-  useMotionValueEvent,
   useReducedMotion,
-  useScroll,
-  useTransform,
 } from "framer-motion";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
+import { TRIGGER } from "@/lib/motion-tokens";
 import { cn } from "@/lib/cn";
 
 type Experience = {
@@ -78,34 +78,46 @@ export function SensoryExperiences() {
 
 function ImmersiveStage() {
   const stageRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const overallRailRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: stageRef,
-    offset: ["start start", "end end"],
-  });
-
-  // Active stage index from scroll progress (0, 1, 2)
-  const stageMV = useTransform(scrollYProgress, (p) =>
-    p < 0.34 ? 0 : p < 0.67 ? 1 : 2,
-  );
-  const [stageIdx, setStageIdx] = useState<0 | 1 | 2>(reduce ? 2 : 0);
-  useMotionValueEvent(stageMV, "change", (v) => {
-    if (!reduce) setStageIdx(v as 0 | 1 | 2);
-  });
-
-  // Per-stage local progress 0-1 (used to drive canvas intensity)
-  const stageProgressMV = useTransform(scrollYProgress, (p) => {
-    if (p < 0.34) return p / 0.34;
-    if (p < 0.67) return (p - 0.34) / 0.33;
-    return (p - 0.67) / 0.33;
-  });
+  const [stageIdx, setStageIdx] = useState<0 | 1 | 2>(0);
   const [stageProgress, setStageProgress] = useState(0);
-  useMotionValueEvent(stageProgressMV, "change", (v) => {
-    if (!reduce) setStageProgress(Math.max(0, Math.min(1, v)));
-  });
 
-  // Overall scroll progress for the top hairline
-  const overallScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  // GSAP ScrollTrigger pins the stage for ~3 viewports of scroll and scrubs
+  // a timeline that derives the active experience index and per-stage
+  // progress from scroll position. scrub:1 catches the score-style number
+  // motion smoothing per the guideline.
+  useEffect(() => {
+    if (reduce) return;
+    const section = stageRef.current;
+    const pinned = pinRef.current;
+    if (!section || !pinned) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: "bottom bottom",
+        pin: pinned,
+        pinSpacing: false,
+        scrub: TRIGGER.scrub,
+        onUpdate: (self) => {
+          const p = self.progress;
+          setStageIdx((p < 0.34 ? 0 : p < 0.67 ? 1 : 2) as 0 | 1 | 2);
+          const local =
+            p < 0.34 ? p / 0.34 : p < 0.67 ? (p - 0.34) / 0.33 : (p - 0.67) / 0.33;
+          setStageProgress(Math.max(0, Math.min(1, local)));
+          if (overallRailRef.current) {
+            gsap.set(overallRailRef.current, { scaleX: p });
+          }
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, [reduce]);
 
   const current = experiences[stageIdx];
 
@@ -121,7 +133,7 @@ function ImmersiveStage() {
       className="relative h-[300vh] md:h-[400vh]"
       aria-label="Three immersive regulation experiences, switched by scroll."
     >
-      <div className="sticky top-0 h-screen overflow-hidden">
+      <div ref={pinRef} className="h-screen overflow-hidden">
         <div
           className="relative h-screen w-full overflow-hidden text-paper"
           style={{
@@ -145,16 +157,18 @@ function ImmersiveStage() {
           {/* Persistent dark base under all backgrounds */}
           <div aria-hidden className="absolute inset-0 -z-10 bg-[#14101a]" />
 
-          {/* Top progress hairline */}
+          {/* Top progress hairline — scaleX driven by ScrollTrigger */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[2px]">
             <div className="h-full w-full bg-white/[0.06]" />
-            <motion.div
+            <div
+              ref={overallRailRef}
               className="absolute inset-y-0 left-0 origin-left"
               style={{
-                scaleX: reduce ? 1 : overallScale,
                 width: "100%",
                 background:
                   "linear-gradient(90deg, transparent 0%, #F2C3CE 40%, #B05E76 100%)",
+                transform: reduce ? "scaleX(1)" : "scaleX(0)",
+                willChange: "transform",
               }}
             />
           </div>

@@ -121,7 +121,7 @@ export function Hero() {
         </div>
 
         <Reveal delay={0.2} from="right" className="relative">
-          <DeviceMockup parallax />
+          <DeviceMockup parallax animateScore />
         </Reveal>
       </div>
     </section>

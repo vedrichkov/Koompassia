@@ -1,8 +1,11 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
+import { TRIGGER } from "@/lib/motion-tokens";
 import { cn } from "@/lib/cn";
 
 const steps = [
@@ -34,14 +37,36 @@ const steps = [
 
 export function HowItWorks() {
   const ref = useRef<HTMLDivElement>(null);
+  const railFill = useRef<HTMLDivElement>(null);
+  const railDot = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 70%", "end 30%"],
-  });
-  const progressHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
-  // Moving dot on the progress rail
-  const dotY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  // GSAP ScrollTrigger drives the rail fill height and the dot's top
+  // position from 0 → 100% as the user scrolls the section, with scrub:1
+  // for the gentle smoothing the guideline specifies.
+  useEffect(() => {
+    const section = ref.current;
+    if (!section || reduce) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.set(railFill.current, { scaleY: 0, transformOrigin: "top center" });
+      gsap.set(railDot.current, { top: "0%", y: "-50%" });
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 70%",
+        end: "bottom 30%",
+        scrub: TRIGGER.scrub,
+        onUpdate: (self) => {
+          gsap.set(railFill.current, { scaleY: self.progress });
+          gsap.set(railDot.current, { top: `${self.progress * 100}%` });
+        },
+      });
+    }, section);
+
+    return () => ctx.revert();
+  }, [reduce]);
 
   return (
     <section id="how" className="relative py-24 md:py-32">
@@ -64,14 +89,18 @@ export function HowItWorks() {
           <div className="hidden md:block">
             <div className="sticky top-32">
               <div className="relative ml-4 h-[320px] w-[2px] overflow-visible rounded-full bg-line">
-                <motion.div
-                  className="absolute inset-x-0 top-0 rounded-full bg-clay/80"
-                  style={{ height: reduce ? "100%" : progressHeight }}
+                <div
+                  ref={railFill}
+                  className="absolute inset-x-0 top-0 h-full origin-top rounded-full bg-clay/80"
+                  style={{
+                    transform: reduce ? "scaleY(1)" : "scaleY(0)",
+                    willChange: "transform",
+                  }}
                 />
-                {/* Moving dot that travels with scroll */}
-                <motion.div
-                  className="absolute -left-[5px] h-3 w-3 rounded-full border-2 border-paper bg-clay shadow-soft"
-                  style={{ top: reduce ? "100%" : dotY, transform: "translateY(-50%)" }}
+                <div
+                  ref={railDot}
+                  className="absolute -left-[5px] h-3 w-3 -translate-y-1/2 rounded-full border-2 border-paper bg-clay shadow-soft"
+                  style={{ top: reduce ? "100%" : "0%", willChange: "top" }}
                 />
               </div>
               <div className="mt-6 text-[11px] font-semibold uppercase tracking-eyebrow text-amber">

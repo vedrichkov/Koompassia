@@ -1,42 +1,90 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { DUR, EASE, PARALLAX, TRIGGER } from "@/lib/motion-tokens";
 
 type Props = {
   className?: string;
   /** 0–100. Defaults to 74. */
   score?: number;
-  /** Apply parallax based on document scroll. */
+  /** Apply parallax based on document scroll (GSAP ScrollTrigger). */
   parallax?: boolean;
+  /** Animate the score from 0 → score on mount (hero load timeline). */
+  animateScore?: boolean;
 };
 
-export function DeviceMockup({ className, score = 74, parallax = false }: Props) {
+export function DeviceMockup({
+  className,
+  score = 74,
+  parallax = false,
+  animateScore = false,
+}: Props) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [-1.5, 1.5]);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [displayScore, setDisplayScore] = useState(
+    animateScore && !reduce ? 0 : score,
+  );
+
+  // Parallax via GSAP ScrollTrigger (mid plane: 0.7×).
+  useEffect(() => {
+    if (!parallax || reduce) return;
+    const node = innerRef.current;
+    if (!node) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const ctx = gsap.context(() => {
+      gsap.to(node, {
+        y: -80 * (1 - PARALLAX.mid), // mid-plane drift
+        rotate: 1.5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: node,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: TRIGGER.scrub,
+        },
+      });
+    }, node);
+
+    return () => ctx.revert();
+  }, [parallax, reduce]);
+
+  // NRS count-up: 0 → score over 1.2s on mount via GSAP. Settle easing.
+  useEffect(() => {
+    if (!animateScore || reduce) {
+      setDisplayScore(score);
+      return;
+    }
+    const obj = { v: 0 };
+    const tween = gsap.to(obj, {
+      v: score,
+      duration: 1.2,
+      ease: EASE.settle,
+      delay: 0.6,
+      onUpdate: () => setDisplayScore(Math.round(obj.v)),
+    });
+    return () => {
+      tween.kill();
+    };
+  }, [animateScore, score, reduce]);
 
   return (
     <div
       ref={ref}
       className={className}
-      aria-label="A preview of the Koompassia app on iPhone, showing a calm breathing prompt and a Neural Regulation Score of seventy-four"
+      aria-label={`A preview of the Koompassia app on iPhone, showing a calm breathing prompt and a Neural Regulation Score of ${score}`}
       role="img"
     >
-      <motion.div
+      <div
+        ref={innerRef}
         className="relative mx-auto"
-        style={{
-          width: "min(360px, 84vw)",
-          y: parallax && !reduce ? y : 0,
-          rotate: parallax && !reduce ? rotate : 0,
-        }}
+        style={{ width: "min(360px, 84vw)", willChange: parallax && !reduce ? "transform" : undefined }}
       >
-        {/* Ambient halo behind the phone */}
+        {/* Ambient halo behind the phone — eternal breathing loop */}
         <motion.div
           aria-hidden
           className="absolute -inset-12 -z-10 rounded-[60%]"
@@ -46,7 +94,7 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
             filter: "blur(36px)",
           }}
           animate={reduce ? undefined : { opacity: [0.85, 1, 0.85], scale: [1, 1.04, 1] }}
-          transition={reduce ? undefined : { duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          transition={reduce ? undefined : { duration: DUR.breathe, repeat: Infinity, ease: "easeInOut" }}
         />
 
         {/* iPhone frame */}
@@ -59,7 +107,6 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
               "0 50px 90px -30px rgba(43,30,33,0.45), 0 18px 36px -18px rgba(176,94,118,0.32), inset 0 0 0 1px rgba(255,255,255,0.55)",
           }}
         >
-          {/* Inner bezel ring */}
           <div
             className="relative h-full w-full overflow-hidden rounded-[43px] p-[2px]"
             style={{
@@ -67,7 +114,6 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
                 "linear-gradient(180deg, rgba(31,23,24,0.85), rgba(31,23,24,0.65))",
             }}
           >
-            {/* Screen */}
             <div
               className="relative h-full w-full overflow-hidden rounded-[40px]"
               style={{
@@ -75,10 +121,8 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
                   "linear-gradient(170deg, #F8EAE9 0%, #F1CFD3 55%, #EAB4BB 100%)",
               }}
             >
-              {/* Dynamic Island */}
               <div className="absolute left-1/2 top-2 z-20 h-[28px] w-[100px] -translate-x-1/2 rounded-full bg-bark-deep/95" />
 
-              {/* Status bar */}
               <div className="relative z-10 flex items-center justify-between px-7 pt-3 text-[11px] font-medium text-ink/80">
                 <span className="tabular-nums">9:41</span>
                 <div className="flex items-center gap-1.5" aria-hidden>
@@ -88,7 +132,6 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
                 </div>
               </div>
 
-              {/* Center breathing UI */}
               <div className="relative z-10 flex h-[calc(100%-44px)] flex-col items-center px-6">
                 <div className="mt-10 flex items-center gap-2">
                   <span className="h-px w-4 bg-clay/60" aria-hidden />
@@ -111,20 +154,20 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
                       boxShadow: "inset 0 0 40px rgba(255,255,255,0.65)",
                     }}
                     animate={reduce ? undefined : { scale: [1, 1.07, 1], opacity: [0.9, 1, 0.9] }}
-                    transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                    transition={reduce ? undefined : { duration: DUR.breathe, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <motion.div
                     aria-hidden
                     className="absolute inset-6 rounded-full border border-white/70"
                     style={{ background: "radial-gradient(circle, rgba(255,255,255,0.45), transparent 70%)" }}
                     animate={reduce ? undefined : { scale: [1, 1.045, 1], opacity: [0.85, 1, 0.85] }}
-                    transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
+                    transition={reduce ? undefined : { duration: DUR.breathe, repeat: Infinity, ease: "easeInOut", delay: 0.25 }}
                   />
                   <motion.div
                     aria-hidden
                     className="absolute inset-12 rounded-full border border-white/45"
                     animate={reduce ? undefined : { scale: [1, 1.03, 1] }}
-                    transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                    transition={reduce ? undefined : { duration: DUR.breathe, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                   />
 
                   <div className="relative z-10 flex flex-col items-center">
@@ -132,7 +175,7 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
                       NRS
                     </span>
                     <span className="serif mt-1 text-[78px] font-normal leading-none tracking-[-0.04em] text-ink/95 tabular-nums">
-                      {score}
+                      {displayScore}
                     </span>
                     <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.18em] text-clay/70">
                       Steady
@@ -158,7 +201,7 @@ export function DeviceMockup({ className, score = 74, parallax = false }: Props)
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
