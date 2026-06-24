@@ -68,13 +68,20 @@ export const PARALLAX = {
 
 // ===== Act boundaries (uDarkness target per act) =====
 // Used by AmbientCanvas to wipe between light and dark acts.
+// Reorder (Pass 2 #11): proof + price now precede the poetic middle,
+// so Act II becomes "Decision" instead of "Mechanism" — still light,
+// barely warmer than pure Surface to mark the boundary. The old
+// `mechanism` key is kept for back-compat if any data-act attribute
+// still references it.
 export const ACT_INTENSITY = {
-  /** Act I — Surface, light */
+  /** Act I — Surface, light. Your everyday + the score. */
   surface: 0.0,
-  /** Act II — Mechanism, light warming */
+  /** Act II — Decision, light + barely warm. Proof + pricing. */
+  decision: 0.05,
+  /** Act II (legacy) — Mechanism, light warming. */
   mechanism: 0.15,
-  /** Act III — Interior, fully dark */
+  /** Act III — Interior, fully dark. Inside the nervous system. */
   interior: 1.0,
-  /** Act IV — Resurface, light again */
+  /** Act IV — Resurface, light again. */
   resurface: 0.05,
 } as const;

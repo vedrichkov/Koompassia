@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/sections/Hero";
-// DemoPreview removed in P2: the "Coming soon" placeholder was actively
-// suppressing intent. Re-add the import + section below Hero once real
-// screenshots and demo video land in /public.
+// DemoPreview removed in Pass 2: the "Coming soon" placeholder was
+// actively suppressing intent. Re-add once real screenshots and demo
+// video land in /public.
 // import { DemoPreview } from "@/components/sections/DemoPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { NervousSystemIntel } from "@/components/sections/NervousSystemIntel";
@@ -37,15 +37,21 @@ export const metadata: Metadata = {
 };
 
 /**
- * Page restructured into the four-act narrative spine.
- * The `data-act` attribute on each wrapper is the contract with the
- * ActDirector: as each act enters the viewport it tweens the ambient
- * canvas's uDarkness toward that act's target intensity.
+ * Pass 2 reorder (#11): proof + pricing pulled forward so the
+ * convinced reader can convert before the poetic middle. The 4-act
+ * narrative spine becomes:
  *
- *   Act I  — Surface       (light)              Your everyday + the score.
- *   Act II — Mechanism     (light, warming)     How it works on you.
- *   Act III — Interior     (DARK)               Inside the nervous system.
- *   Act IV — Resurface     (light)              Back to your life, equipped.
+ *   Act I  — Surface  (light)            Your everyday + the score
+ *   Act II — Decision (light, +warm)     Proof + price; convert here
+ *   Act III — Interior (DARK)            The immersive stretch
+ *   Act IV — Resurface (light)           Back to your life, equipped
+ *
+ * The `data-act` attribute is the contract with ActDirector: each act
+ * tweens uDarkness to ACT_INTENSITY[act] as it enters viewport.
+ *
+ * Section numbering (I-VII) follows true narrative DOM order; interludes
+ * (AdaptiveAtmosphere, Privacy, Pricing, FAQ, FinalCTA) carry
+ * unnumbered eyebrows deliberately.
  */
 export default function HomePage() {
   return (
@@ -56,21 +62,21 @@ export default function HomePage() {
         <NervousSystemIntel />
       </div>
 
-      <div data-act="mechanism">
-        <AdaptiveAtmosphere />
-        <EmbodiedPractices />
+      <div data-act="decision">
+        <Science />
+        <Pricing />
       </div>
 
       <div data-act="interior">
+        <AdaptiveAtmosphere />
         <SensoryExperiences />
+        <EmbodiedPractices />
         <AppleWatch />
       </div>
 
       <div data-act="resurface">
         <CloseTheLoop />
-        <Science />
         <Privacy />
-        <Pricing />
         <FAQ />
         <FinalCTA />
       </div>

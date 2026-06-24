@@ -17,7 +17,7 @@ export function AppleWatch() {
             as="div"
             className="dark-card-lit relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper md:p-12"
           >
-            <Eyebrow index="05">
+            <Eyebrow index="06">
               <span className="text-amber-soft">On the wrist</span>
             </Eyebrow>
             <h2 className="serif mt-5 text-[clamp(28px,3.4vw,40px)] font-medium leading-[1.1] tracking-tighter2 text-balance text-paper">

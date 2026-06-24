@@ -32,7 +32,7 @@ export function EmbodiedPractices() {
     <section className="relative py-24 md:py-32">
       <div className="shell">
         <Reveal as="div" className="max-w-2xl">
-          <Eyebrow index="03">Embodied practices</Eyebrow>
+          <Eyebrow index="05">Embodied practices</Eyebrow>
           <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
             Breathing, walking, reflection, <em className="italic">voice.</em>
           </h2>

@@ -29,7 +29,7 @@ export function Science() {
       <div className="shell">
         <div className="grid gap-12 md:grid-cols-[0.95fr_1.05fr] md:gap-16">
           <Reveal as="div">
-            <Eyebrow index="07">The science</Eyebrow>
+            <Eyebrow index="03">The science</Eyebrow>
             <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
               Grounded in research. <em className="italic">Built for real life.</em>
             </h2>
