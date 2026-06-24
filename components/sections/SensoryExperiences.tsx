@@ -17,23 +17,27 @@ type Experience = {
   name: string;
   axis: string;
   caption: string;
-  /** Stage background — soft cream/blush gradient per experience. */
-  bg: string;
+  /**
+   * Localized accent wash — small soft halo behind the canvas only. The
+   * stage itself stays transparent so the page's body gradient and the
+   * AmbientCanvas WebGL show through unbroken. Each experience contributes
+   * a different blush tint here so the crossfade still reads as three
+   * distinct moods, without painting a "block" across the viewport.
+   */
+  accentWash: string;
   /** Accent color (clay family) used for progress glyph + overlays. */
   accent: string;
   Canvas: React.FC<{ active: boolean; intensity: number }>;
 };
 
-// Light theme rebuild: backgrounds are warm cream variants tinted with the
-// experience's accent. Each experience has a subtly different radial center
-// so the stage feels alive without going dark.
 const experiences: Experience[] = [
   {
     name: "Still Water",
     axis: "Stillness",
     caption:
       "Steady breath, soft visual feedback. As you stay composed, the water settles and clarity emerges.",
-    bg: "radial-gradient(70% 60% at 65% 50%, #FBE6E5 0%, #F4D5D6 50%, #EFC8C7 100%)",
+    accentWash:
+      "radial-gradient(60% 60% at 50% 50%, rgba(176, 94, 118, 0.18) 0%, rgba(176, 94, 118, 0.06) 50%, transparent 80%)",
     accent: "#B05E76",
     Canvas: StillWaterCanvas,
   },
@@ -42,7 +46,8 @@ const experiences: Experience[] = [
     axis: "Rhythm",
     caption:
       "Rhythmic breathing gradually builds a living visual structure. Breathwork that feels like watching a slow star bloom.",
-    bg: "radial-gradient(70% 60% at 55% 50%, #FCEAEA 0%, #F1CFD3 55%, #EAB4BB 100%)",
+    accentWash:
+      "radial-gradient(60% 60% at 50% 50%, rgba(162, 79, 98, 0.20) 0%, rgba(162, 79, 98, 0.07) 50%, transparent 80%)",
     accent: "#A24F62",
     Canvas: CosmicBreathCanvas,
   },
@@ -51,7 +56,8 @@ const experiences: Experience[] = [
     axis: "Attention",
     caption:
       "Attention and control through motion, rhythm, composure. Guide an orbiting path with precision, return to center.",
-    bg: "radial-gradient(70% 60% at 40% 50%, #F9E5E3 0%, #F0CFCF 55%, #E5B6B5 100%)",
+    accentWash:
+      "radial-gradient(60% 60% at 50% 50%, rgba(142, 63, 82, 0.18) 0%, rgba(142, 63, 82, 0.06) 50%, transparent 80%)",
     accent: "#8E3F52",
     Canvas: AxisCanvas,
   },
@@ -131,32 +137,17 @@ function ImmersiveStage() {
       aria-label="Three immersive regulation experiences, switched by scroll."
     >
       <div ref={pinRef} className="h-screen overflow-hidden">
-        <div
-          className="relative h-screen w-full overflow-hidden text-ink"
-          style={{
-            boxShadow:
-              "inset 0 1px 0 rgba(176, 94, 118, 0.10), inset 0 -1px 0 rgba(176, 94, 118, 0.10)",
-          }}
-        >
-          {/* Atmospheric backgrounds — crossfade per stage */}
-          {experiences.map((e, i) => (
-            <motion.div
-              key={`bg-${i}`}
-              aria-hidden
-              className="absolute inset-0"
-              style={{ background: e.bg }}
-              initial={false}
-              animate={{ opacity: stageIdx === i ? 1 : 0 }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            />
-          ))}
-
-          {/* Persistent cream base under all backgrounds */}
-          <div aria-hidden className="absolute inset-0 -z-10 bg-cream" />
-
+        {/*
+          Stage is fully transparent so the page's body gradient and the
+          AmbientCanvas WebGL show through unbroken. No inset shadow, no
+          persistent cream base, no full-bleed gradient. The only
+          per-stage color comes from a small localized accent halo behind
+          the canvas (added inside the right column below).
+        */}
+        <div className="relative h-screen w-full overflow-hidden text-ink">
           {/* Top progress hairline — scaleX driven by ScrollTrigger */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[2px]">
-            <div className="h-full w-full bg-line/60" />
+            <div className="h-full w-full bg-line/50" />
             <div
               ref={overallRailRef}
               className="absolute inset-y-0 left-0 origin-left"
@@ -268,8 +259,23 @@ function ImmersiveStage() {
               </div>
             </div>
 
-            {/* RIGHT: Canvas stage, full-bleed */}
+            {/* RIGHT: Canvas stage with localized accent halo per experience.
+                The halo is the only per-stage background; it's small and
+                soft so the surrounding page atmosphere reads continuously. */}
             <div className="relative h-[60vh] overflow-hidden md:h-full">
+              {/* Per-experience accent wash — crossfades behind the canvas */}
+              {experiences.map((e, i) => (
+                <motion.div
+                  key={`wash-${i}`}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0"
+                  style={{ background: e.accentWash }}
+                  initial={false}
+                  animate={{ opacity: stageIdx === i ? 1 : 0 }}
+                  transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                />
+              ))}
+
               {experiences.map((e, i) => {
                 const Canvas = e.Canvas;
                 const isActive = stageIdx === i;
@@ -291,16 +297,6 @@ function ImmersiveStage() {
                   </motion.div>
                 );
               })}
-
-              {/* Soft vignette so canvas edges blend into the cream stage */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(85% 100% at 50% 50%, transparent 50%, rgba(248,239,237,0.6) 100%)",
-                }}
-              />
             </div>
           </div>
 
@@ -310,7 +306,7 @@ function ImmersiveStage() {
               {experiences.map((_, i) => (
                 <div
                   key={`seg-${i}`}
-                  className="relative h-px flex-1 overflow-hidden bg-line/60"
+                  className="relative h-px flex-1 overflow-hidden bg-line/50"
                 >
                   <motion.div
                     className="absolute inset-y-0 left-0 origin-left"
@@ -352,7 +348,6 @@ function ReducedMotionStack() {
           <div
             key={e.name}
             className="relative overflow-hidden rounded-3xl border border-line bg-paper shadow-soft"
-            style={{ background: e.bg }}
           >
             <div className="grid items-center md:grid-cols-[1fr_1.4fr]">
               <div className="p-8 md:p-12">
@@ -369,7 +364,10 @@ function ReducedMotionStack() {
                   {e.caption}
                 </p>
               </div>
-              <div className="relative h-[40vh] overflow-hidden">
+              <div
+                className="relative h-[40vh] overflow-hidden"
+                style={{ background: e.accentWash }}
+              >
                 <Canvas active={false} intensity={0} />
               </div>
             </div>
