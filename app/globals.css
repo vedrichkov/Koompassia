@@ -44,7 +44,8 @@
     overflow-x: clip;
   }
 
-  /* Ambient layered background, fixed behind everything */
+  /* Ambient layered background, fixed behind everything.
+     Asymmetric: left third pulls 2% cooler, right side carries the warm light. */
   body::before {
     content: "";
     position: fixed;
@@ -52,8 +53,9 @@
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(900px 600px at 12% -5%, rgba(215, 126, 145, 0.12), transparent 60%),
-      radial-gradient(800px 700px at 100% 8%, rgba(242, 195, 206, 0.30), transparent 55%),
+      linear-gradient(105deg, #F2E6E3 0%, var(--cream) 38%, #FAF1EE 100%),
+      radial-gradient(900px 600px at 12% -5%, rgba(215, 126, 145, 0.10), transparent 60%),
+      radial-gradient(800px 700px at 100% 8%, rgba(242, 195, 206, 0.32), transparent 55%),
       radial-gradient(700px 600px at 50% 110%, rgba(176, 94, 118, 0.08), transparent 60%),
       var(--cream);
   }
@@ -87,6 +89,27 @@
   .serif {
     font-family: var(--font-serif), Georgia, serif;
     font-feature-settings: "ss01", "ss02";
+    font-variation-settings: "opsz" 96, "SOFT" 25;
+  }
+
+  /* Italic discipline: lighter optical size, slightly looser tracking,
+     baseline nudge so the italic doesn't read as a CSS toggle. */
+  .serif em,
+  .serif i,
+  em.italic {
+    font-style: italic;
+    font-weight: 380;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    letter-spacing: 0.01em;
+    transform: translateY(-1px);
+    display: inline-block;
+  }
+
+  /* Display-size italics get the highest opsz and a touch more breathing */
+  h1 em,
+  h1 i {
+    font-variation-settings: "opsz" 144, "SOFT" 60;
+    letter-spacing: 0.005em;
   }
 
   .shell {
@@ -123,6 +146,28 @@
   /* Warm-dark CTA gradient */
   .bark-gradient {
     background: linear-gradient(165deg, var(--bark-deep) 0%, var(--bark) 55%, #5e3744 100%);
+  }
+
+  /* Dark cards with interior light — gives them a horizon line, makes them
+     read as objects with a light source rather than flat "dark card components." */
+  .dark-card-lit {
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(215, 126, 145, 0.10), transparent 60%),
+      radial-gradient(ellipse 60% 30% at 100% 100%, rgba(176, 94, 118, 0.08), transparent 65%),
+      var(--bark);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+      0 30px 60px -25px rgba(25, 17, 15, 0.45);
+  }
+  .dark-card-lit--cta {
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(242, 195, 206, 0.10), transparent 60%),
+      linear-gradient(165deg, var(--bark-deep) 0%, var(--bark) 55%, #5e3744 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+      0 30px 60px -25px rgba(25, 17, 15, 0.45);
   }
 
   /* Entrance — CSS animation, SSR-safe. Element is visible by default;

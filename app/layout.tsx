@@ -9,8 +9,8 @@ import "./globals.css";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
-  weight: ["400", "500"],
   style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
   variable: "--font-serif",
   display: "swap",
 });

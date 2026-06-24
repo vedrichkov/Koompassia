@@ -23,7 +23,7 @@ export function CTABand({
     <section
       id="get"
       className={cn(
-        "relative isolate overflow-hidden rounded-[28px] bark-gradient px-8 py-20 text-paper md:px-16 md:py-24",
+        "dark-card-lit--cta relative isolate overflow-hidden rounded-[28px] px-8 py-20 text-paper md:px-16 md:py-24",
         className,
       )}
     >

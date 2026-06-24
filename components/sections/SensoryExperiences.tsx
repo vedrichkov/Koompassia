@@ -43,16 +43,8 @@ export function SensoryExperiences() {
         <ul className="mt-14 grid gap-6 md:grid-cols-3">
           {experiences.map((e, i) => (
             <Reveal as="li" key={e.name} delay={i * 0.08}>
-              <article className="group relative h-full overflow-hidden rounded-3xl border border-bark-deep/40 p-8 text-paper shadow-lift transition-all duration-500 hover:-translate-y-1">
-                <div
-                  aria-hidden
-                  className="absolute inset-0 -z-10"
-                  style={{
-                    background:
-                      "linear-gradient(165deg, #1a1214 0%, #2A2122 55%, #4d2f3a 100%)",
-                  }}
-                />
-                <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/[0.08]">
+              <article className="dark-card-lit group relative h-full overflow-hidden rounded-3xl border border-bark-deep/40 p-8 text-paper transition-all duration-500 hover:-translate-y-1">
+                <div className="relative aspect-square overflow-hidden rounded-2xl border border-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
                   {e.canvas}
                 </div>
                 <div className="mt-7">

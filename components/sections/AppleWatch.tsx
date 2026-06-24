@@ -39,16 +39,8 @@ export function AppleWatch() {
 
           {/* Right, dark contrast panel with watch face */}
           <Reveal as="div" delay={0.1}
-            className="relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper shadow-lift md:p-12"
+            className="dark-card-lit--cta relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper md:p-12"
             >
-            <div
-              aria-hidden
-              className="absolute inset-0 -z-10"
-              style={{
-                background:
-                  "linear-gradient(165deg, #19110F 0%, #2A2122 55%, #5e3744 100%)",
-              }}
-            />
             <div
               aria-hidden
               className="pointer-events-none absolute -right-24 -top-24 h-[340px] w-[340px] rounded-full"

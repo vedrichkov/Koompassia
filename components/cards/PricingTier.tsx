@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { IconCheck, IconArrow } from "@/lib/icons";
 import { cn } from "@/lib/cn";
 
@@ -31,56 +30,45 @@ export function PricingTier({
   return (
     <article
       className={cn(
-        "relative flex h-full flex-col overflow-hidden rounded-3xl border p-8 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-lift",
+        "relative flex h-full flex-col overflow-hidden border p-8 transition-all duration-500",
         featured
-          ? "border-bark-deep/40 text-paper"
-          : "border-line bg-paper text-ink",
+          ? "dark-card-lit rounded-[28px] border-bark-deep/40 text-paper md:scale-[1.04] md:-translate-y-3 md:p-10"
+          : "rounded-3xl border-line bg-paper text-ink shadow-soft hover:-translate-y-1 hover:shadow-lift",
         className,
       )}
-      style={
-        featured
-          ? {
-              background:
-                "linear-gradient(165deg, #19110F 0%, #2A2122 55%, #5e3744 100%)",
-            }
-          : undefined
-      }
     >
       {featured ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(242,195,206,0.32), transparent 60%)",
-            filter: "blur(8px)",
-          }}
-        />
+        <p className="serif relative mb-5 text-[11px] italic uppercase tracking-[0.32em] text-amber-soft/80">
+          the considered choice
+        </p>
       ) : null}
 
       <div className="relative">
-        <div className="flex items-baseline justify-between">
-          <h3 className={cn("serif text-[26px] font-medium tracking-tightish", featured ? "text-paper" : "text-ink")}>
-            {name}
-          </h3>
-          {featured ? (
-            <span className="rounded-full border border-amber-soft/40 bg-amber-soft/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-eyebrow text-amber-soft">
-              Most chosen
-            </span>
-          ) : null}
-        </div>
+        <h3
+          className={cn(
+            "serif font-medium tracking-tightish",
+            featured ? "text-[30px] text-paper" : "text-[26px] text-ink",
+          )}
+        >
+          {name}
+        </h3>
 
         <p
           className={cn(
-            "mt-4 text-[14px] leading-relaxed text-pretty",
-            featured ? "text-paper/75" : "text-ink-soft",
+            "mt-3 text-[14px] leading-relaxed text-pretty",
+            featured ? "text-paper/72" : "text-ink-soft",
           )}
         >
           {pitch}
         </p>
 
         <div className="mt-6 flex items-baseline gap-2">
-          <span className={cn("serif text-[40px] font-medium leading-none tracking-[-0.02em]", featured ? "text-paper" : "text-ink")}>
+          <span
+            className={cn(
+              "serif font-medium leading-none tracking-[-0.02em] tabular-nums",
+              featured ? "text-[44px] text-paper" : "text-[40px] text-ink",
+            )}
+          >
             {price}
           </span>
           {priceSub ? (
@@ -91,8 +79,10 @@ export function PricingTier({
         </div>
       </div>
 
-      <ul className="relative mt-7 space-y-3 border-t pt-6"
-          style={{ borderColor: featured ? "rgba(255,255,255,0.12)" : "var(--line-soft)" }}>
+      <ul
+        className="relative mt-7 space-y-3 border-t pt-6"
+        style={{ borderColor: featured ? "rgba(255,255,255,0.10)" : "var(--line-soft)" }}
+      >
         {features.map((f) => (
           <li
             key={f}

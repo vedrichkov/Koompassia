@@ -42,16 +42,8 @@ export function NervousSystemIntel() {
           {/* NRS visualization card */}
           <Reveal
             as="div"
-            className="relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper shadow-lift md:p-14"
+            className="dark-card-lit relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper md:p-14"
           >
-            <div
-              aria-hidden
-              className="absolute inset-0 -z-10"
-              style={{
-                background:
-                  "linear-gradient(165deg, #19110F 0%, #2A2122 55%, #5e3744 100%)",
-              }}
-            />
             {/* breathing glow */}
             <motion.div
               aria-hidden

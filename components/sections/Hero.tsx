@@ -14,28 +14,39 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden pt-12 pb-20 md:pt-24 md:pb-32">
-      {/* Drifting decorative orbs */}
+      {/* Primary atmospheric light leak behind the device */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute right-[-30%] top-[-15%] h-[400px] w-[400px] rounded-full md:right-[-12%] md:top-[-12%] md:h-[640px] md:w-[640px]"
+        className="pointer-events-none absolute right-[-30%] top-[-25%] h-[700px] w-[700px] rounded-full md:right-[-8%] md:top-[-15%] md:h-[1200px] md:w-[1200px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(242,195,206,0.55), rgba(215,126,145,0.18) 45%, transparent 70%)",
-          filter: "blur(40px)",
+            "radial-gradient(closest-side, rgba(255,245,240,0.88) 0%, rgba(242,195,206,0.42) 30%, rgba(215,126,145,0.12) 60%, transparent 80%)",
+          filter: "blur(80px)",
         }}
-        animate={reduce ? undefined : { x: [0, 18, 0], y: [0, -14, 0] }}
-        transition={reduce ? undefined : { duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        animate={reduce ? undefined : { x: [0, 16, 0], y: [0, -10, 0] }}
+        transition={reduce ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
+      {/* Deeper warm glow giving the device a shadow side */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute left-[-30%] bottom-[10%] h-[280px] w-[280px] rounded-full md:left-[-8%] md:h-[420px] md:w-[420px]"
+        className="pointer-events-none absolute right-[2%] top-[28%] hidden h-[460px] w-[460px] rounded-full md:block"
         style={{
           background:
             "radial-gradient(circle, rgba(176,94,118,0.18), transparent 65%)",
-          filter: "blur(40px)",
+          filter: "blur(60px)",
         }}
-        animate={reduce ? undefined : { x: [0, -16, 0], y: [0, 12, 0] }}
-        transition={reduce ? undefined : { duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        animate={reduce ? undefined : { x: [0, -10, 0], y: [0, 14, 0] }}
+        transition={reduce ? undefined : { duration: 22, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {/* Quiet counter-light bottom-left, keeps left column from going flat */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-[-8%] bottom-[8%] hidden h-[320px] w-[320px] rounded-full md:block"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(176,94,118,0.10), transparent 65%)",
+          filter: "blur(50px)",
+        }}
       />
 
       <div className="shell relative grid items-center gap-12 md:grid-cols-[1.05fr_0.95fr] md:gap-12">

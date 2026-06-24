@@ -44,7 +44,7 @@ const tiers = [
       "Priority access to new features",
       "Long-form pattern reports",
     ],
-    cta: { href: "https://apps.apple.com/", label: "Best value" },
+    cta: { href: "https://apps.apple.com/", label: "Go yearly" },
     variant: "featured" as const,
     footnote: "Prices may vary by region.",
   },
@@ -64,10 +64,10 @@ export function Pricing() {
           </p>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-14 grid items-stretch gap-6 pt-6 md:grid-cols-3 md:gap-7 md:pt-10">
           {tiers.map((t, i) => (
-            <Reveal as="div" key={t.name} delay={i * 0.08} className="h-full">
-              <PricingTier {...t} />
+            <Reveal as="div" key={t.name} delay={i * 0.08} className="flex h-full">
+              <PricingTier {...t} className="flex-1" />
             </Reveal>
           ))}
         </div>
