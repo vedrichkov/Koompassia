@@ -11,28 +11,37 @@ export function AppleWatch() {
     <section id="watch" className="relative py-24 md:py-32">
       <div className="shell">
         <div className="grid items-stretch gap-6 md:grid-cols-[1.05fr_0.95fr]">
-          {/* Left, the message */}
-          <Reveal as="div" className="rounded-3xl border border-line bg-paper p-10 shadow-soft md:p-12">
-            <Eyebrow index="04">On the wrist</Eyebrow>
-            <h2 className="serif mt-5 text-[clamp(28px,3.4vw,40px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
+          {/* Left, the message — now committed to dark to stay coherent with the
+              watch face panel and to set up Act III as fully interior. */}
+          <Reveal
+            as="div"
+            className="dark-card-lit relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper md:p-12"
+          >
+            <Eyebrow index="04">
+              <span className="text-amber-soft">On the wrist</span>
+            </Eyebrow>
+            <h2 className="serif mt-5 text-[clamp(28px,3.4vw,40px)] font-medium leading-[1.1] tracking-tighter2 text-balance text-paper">
               Regulation that follows your body.
             </h2>
-            <p className="mt-5 text-[17px] leading-relaxed text-ink-soft text-pretty">
+            <p className="mt-5 text-[17px] leading-relaxed text-paper/72 text-pretty">
               The Apple Watch app is free for everyone. A glance, a haptic, a breath, the
               smallest possible footprint between you and the next right move.
             </p>
             <div className="mt-9 space-y-7">
               <MiniRow
+                tone="dark"
                 icon={<IconCalendar />}
                 label="Next Moment"
                 sub="A calendar-aware, full-screen reset that arrives before the meeting, not after it."
               />
               <MiniRow
+                tone="dark"
                 icon={<IconHeart />}
                 label="Breathe and biofeedback"
                 sub="Haptic presets and heart-rate-guided breathing, ready on your wrist."
               />
               <MiniRow
+                tone="dark"
                 icon={<IconWalk />}
                 label="Walk and score"
                 sub="A GPS walk synced with your NRS, so you can see what a slower mile does to you."
@@ -40,7 +49,7 @@ export function AppleWatch() {
             </div>
           </Reveal>
 
-          {/* Right, dark contrast panel with watch face */}
+          {/* Right, watch face panel */}
           <Reveal as="div" delay={0.1}
             className="dark-card-lit--cta relative overflow-hidden rounded-3xl border border-bark-deep/40 p-10 text-paper md:p-12"
             >

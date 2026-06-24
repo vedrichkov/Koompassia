@@ -15,7 +15,9 @@ export function FinalCTA() {
                 A stronger relationship with discipline.
               </>
             }
-            sub="Where nervous system intelligence meets premium design. Discover what discipline feels like when it begins with understanding."
+            sub="Free forever. No card. iPhone and Apple Watch."
+            secondaryHref="#science"
+            secondaryLabel="See the science"
           />
         </Reveal>
       </div>

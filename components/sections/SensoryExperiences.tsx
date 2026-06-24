@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AnimatePresence,
   motion,
   useMotionValueEvent,
   useReducedMotion,
@@ -108,6 +109,12 @@ function ImmersiveStage() {
 
   const current = experiences[stageIdx];
 
+  // Reduced-motion fallback: 3 static stacked panels, no pin, no crossfade.
+  // Hard constraint from the motion guideline.
+  if (reduce) {
+    return <ReducedMotionStack />;
+  }
+
   return (
     <div
       ref={stageRef}
@@ -202,33 +209,34 @@ function ImmersiveStage() {
                   ))}
                 </div>
 
-                {/* Crossfading text content */}
+                {/* Text content — single block keyed to stageIdx so only one
+                    label/heading/caption is ever in the DOM at once. mode="wait"
+                    guarantees the exiting block finishes (opacity 0) before
+                    the incoming block fades in: no co-rendered text overlap. */}
                 <div className="relative mt-12 min-h-[320px] md:min-h-[300px]">
-                  {experiences.map((e, i) => (
+                  <AnimatePresence mode="wait" initial={false}>
                     <motion.div
-                      key={`txt-${i}`}
+                      key={`stage-${stageIdx}`}
+                      initial={reduce ? false : { opacity: 0, y: 12 }}
+                      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+                      exit={reduce ? undefined : { opacity: 0, y: -12 }}
+                      transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
                       className="absolute inset-0"
-                      initial={false}
-                      animate={{
-                        opacity: stageIdx === i ? 1 : 0,
-                        y: stageIdx === i ? 0 : stageIdx > i ? -14 : 14,
-                      }}
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                     >
                       <p
                         className="text-[11px] font-semibold uppercase tracking-[0.32em]"
-                        style={{ color: e.accent + "B3" }}
+                        style={{ color: current.accent + "B3" }}
                       >
-                        {e.axis}
+                        {current.axis}
                       </p>
                       <h3 className="serif mt-4 text-[clamp(38px,5vw,72px)] font-medium leading-[1.02] tracking-tighter2 text-balance text-paper">
-                        {e.name}
+                        {current.name}
                       </h3>
                       <p className="mt-6 max-w-[42ch] text-[16px] leading-relaxed text-paper/72 text-pretty md:text-[17px]">
-                        {e.caption}
+                        {current.caption}
                       </p>
                     </motion.div>
-                  ))}
+                  </AnimatePresence>
                 </div>
 
                 {/* Scroll affordance */}
@@ -319,6 +327,48 @@ function ImmersiveStage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Reduced-motion fallback: three static stacked panels, no pin, no crossfade,
+ * no continuous loops. Each panel renders with its `active=false` so the
+ * canvases stay still. All three experiences are simultaneously legible.
+ */
+function ReducedMotionStack() {
+  return (
+    <div className="space-y-12 py-8">
+      {experiences.map((e, i) => {
+        const Canvas = e.Canvas;
+        return (
+          <div
+            key={e.name}
+            className="dark-card-lit relative overflow-hidden rounded-3xl border border-bark-deep/40"
+            style={{ background: e.bg }}
+          >
+            <div className="grid items-center md:grid-cols-[1fr_1.4fr]">
+              <div className="p-8 md:p-12">
+                <p
+                  className="text-[11px] font-semibold uppercase tracking-[0.32em]"
+                  style={{ color: e.accent + "B3" }}
+                >
+                  {String(i + 1).padStart(2, "0")} · {e.axis}
+                </p>
+                <h3 className="serif mt-3 text-[clamp(28px,3.4vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-paper">
+                  {e.name}
+                </h3>
+                <p className="mt-4 max-w-[42ch] text-[15px] leading-relaxed text-paper/72 text-pretty">
+                  {e.caption}
+                </p>
+              </div>
+              <div className="relative h-[40vh] overflow-hidden">
+                <Canvas active={false} intensity={0} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

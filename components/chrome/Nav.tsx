@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandMark } from "./BrandMark";
 import { Button } from "@/components/primitives/Button";
+import { SITE } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
 const links = [
@@ -63,11 +64,10 @@ export function Nav() {
             For practitioners
           </Link>
           <Button
-            href="/#get"
+            href={SITE.appStoreUrl}
             className="!px-4 !py-2 !text-[13px] md:!px-5 md:!py-2.5 md:!text-[14px]"
           >
-            <span className="md:hidden">Download</span>
-            <span className="hidden md:inline">Download the app</span>
+            Download free
           </Button>
         </div>
       </div>

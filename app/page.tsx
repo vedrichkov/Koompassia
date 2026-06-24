@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/sections/Hero";
+import { DemoPreview } from "@/components/sections/DemoPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { NervousSystemIntel } from "@/components/sections/NervousSystemIntel";
 import { AdaptiveAtmosphere } from "@/components/sections/AdaptiveAtmosphere";
@@ -36,6 +37,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <DemoPreview />
       <HowItWorks />
       <NervousSystemIntel />
       <AdaptiveAtmosphere />
