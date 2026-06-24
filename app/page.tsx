@@ -67,10 +67,17 @@ export default function HomePage() {
         <Pricing />
       </div>
 
-      <div data-act="interior">
+      {/* Mechanism act: AdaptiveAtmosphere + Sensory + EmbodiedPractices
+          all use the standard cream theme, so the ambient stays warm/light
+          (uDarkness 0.15) through this stretch. */}
+      <div data-act="mechanism">
         <AdaptiveAtmosphere />
         <SensoryExperiences />
         <EmbodiedPractices />
+      </div>
+
+      {/* Interior act: focused dark moment, now AppleWatch alone. */}
+      <div data-act="interior">
         <AppleWatch />
       </div>
 

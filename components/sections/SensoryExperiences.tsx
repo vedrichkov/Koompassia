@@ -17,21 +17,24 @@ type Experience = {
   name: string;
   axis: string;
   caption: string;
-  /** Stage background — atmospheric gradient unique per experience. */
+  /** Stage background — soft cream/blush gradient per experience. */
   bg: string;
-  /** Accent color used for progress glyph and overlays. */
+  /** Accent color (clay family) used for progress glyph + overlays. */
   accent: string;
   Canvas: React.FC<{ active: boolean; intensity: number }>;
 };
 
+// Light theme rebuild: backgrounds are warm cream variants tinted with the
+// experience's accent. Each experience has a subtly different radial center
+// so the stage feels alive without going dark.
 const experiences: Experience[] = [
   {
     name: "Still Water",
     axis: "Stillness",
     caption:
-      "Steady breath, soft visual feedback. As you stay composed, the water settles and clarity emerges from the dark.",
-    bg: "radial-gradient(60% 50% at 65% 50%, #2a1f24 0%, #16101a 75%)",
-    accent: "#F2C3CE",
+      "Steady breath, soft visual feedback. As you stay composed, the water settles and clarity emerges.",
+    bg: "radial-gradient(70% 60% at 65% 50%, #FBE6E5 0%, #F4D5D6 50%, #EFC8C7 100%)",
+    accent: "#B05E76",
     Canvas: StillWaterCanvas,
   },
   {
@@ -39,8 +42,8 @@ const experiences: Experience[] = [
     axis: "Rhythm",
     caption:
       "Rhythmic breathing gradually builds a living visual structure. Breathwork that feels like watching a slow star bloom.",
-    bg: "radial-gradient(60% 60% at 55% 50%, #3a2532 0%, #14101a 75%)",
-    accent: "#E5A6B5",
+    bg: "radial-gradient(70% 60% at 55% 50%, #FCEAEA 0%, #F1CFD3 55%, #EAB4BB 100%)",
+    accent: "#A24F62",
     Canvas: CosmicBreathCanvas,
   },
   {
@@ -48,8 +51,8 @@ const experiences: Experience[] = [
     axis: "Attention",
     caption:
       "Attention and control through motion, rhythm, composure. Guide an orbiting path with precision, return to center.",
-    bg: "radial-gradient(60% 60% at 40% 50%, #2c1d25 0%, #141015 75%)",
-    accent: "#D77E91",
+    bg: "radial-gradient(70% 60% at 40% 50%, #F9E5E3 0%, #F0CFCF 55%, #E5B6B5 100%)",
+    accent: "#8E3F52",
     Canvas: AxisCanvas,
   },
 ];
@@ -84,10 +87,6 @@ function ImmersiveStage() {
   const [stageIdx, setStageIdx] = useState<0 | 1 | 2>(0);
   const [stageProgress, setStageProgress] = useState(0);
 
-  // GSAP ScrollTrigger pins the stage for ~3 viewports of scroll and scrubs
-  // a timeline that derives the active experience index and per-stage
-  // progress from scroll position. scrub:1 catches the score-style number
-  // motion smoothing per the guideline.
   useEffect(() => {
     if (reduce) return;
     const section = stageRef.current;
@@ -121,8 +120,6 @@ function ImmersiveStage() {
 
   const current = experiences[stageIdx];
 
-  // Reduced-motion fallback: 3 static stacked panels, no pin, no crossfade.
-  // Hard constraint from the motion guideline.
   if (reduce) {
     return <ReducedMotionStack />;
   }
@@ -135,10 +132,10 @@ function ImmersiveStage() {
     >
       <div ref={pinRef} className="h-screen overflow-hidden">
         <div
-          className="relative h-screen w-full overflow-hidden text-paper"
+          className="relative h-screen w-full overflow-hidden text-ink"
           style={{
             boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.5)",
+              "inset 0 1px 0 rgba(176, 94, 118, 0.10), inset 0 -1px 0 rgba(176, 94, 118, 0.10)",
           }}
         >
           {/* Atmospheric backgrounds — crossfade per stage */}
@@ -154,19 +151,19 @@ function ImmersiveStage() {
             />
           ))}
 
-          {/* Persistent dark base under all backgrounds */}
-          <div aria-hidden className="absolute inset-0 -z-10 bg-[#14101a]" />
+          {/* Persistent cream base under all backgrounds */}
+          <div aria-hidden className="absolute inset-0 -z-10 bg-cream" />
 
           {/* Top progress hairline — scaleX driven by ScrollTrigger */}
           <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[2px]">
-            <div className="h-full w-full bg-white/[0.06]" />
+            <div className="h-full w-full bg-line/60" />
             <div
               ref={overallRailRef}
               className="absolute inset-y-0 left-0 origin-left"
               style={{
                 width: "100%",
                 background:
-                  "linear-gradient(90deg, transparent 0%, #F2C3CE 40%, #B05E76 100%)",
+                  "linear-gradient(90deg, transparent 0%, #B05E76 40%, #8E3F52 100%)",
                 transform: reduce ? "scaleX(1)" : "scaleX(0)",
                 willChange: "transform",
               }}
@@ -185,7 +182,6 @@ function ImmersiveStage() {
                       key={i}
                       type="button"
                       onClick={() => {
-                        // Click-to-jump scrolls the page to that stage's segment
                         const el = stageRef.current;
                         if (!el) return;
                         const offsets = [0.05, 0.45, 0.85];
@@ -197,8 +193,8 @@ function ImmersiveStage() {
                       className={cn(
                         "serif min-h-[44px] min-w-[44px] px-2 py-2 text-[14px] italic transition-all duration-500",
                         stageIdx === i
-                          ? "text-amber-soft"
-                          : "text-paper/40 hover:text-paper/70",
+                          ? "text-clay"
+                          : "text-ink-faint hover:text-clay/70",
                       )}
                       style={{
                         transform: stageIdx === i ? "translateY(-4px)" : "none",
@@ -224,9 +220,7 @@ function ImmersiveStage() {
                 </div>
 
                 {/* Text content — single block keyed to stageIdx so only one
-                    label/heading/caption is ever in the DOM at once. mode="wait"
-                    guarantees the exiting block finishes (opacity 0) before
-                    the incoming block fades in: no co-rendered text overlap. */}
+                    label/heading/caption is ever in the DOM at once. */}
                 <div className="relative mt-12 min-h-[320px] md:min-h-[300px]">
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
@@ -239,14 +233,14 @@ function ImmersiveStage() {
                     >
                       <p
                         className="text-[11px] font-semibold uppercase tracking-[0.32em]"
-                        style={{ color: current.accent + "B3" }}
+                        style={{ color: current.accent }}
                       >
                         {current.axis}
                       </p>
-                      <h3 className="serif mt-4 text-[clamp(38px,5vw,72px)] font-medium leading-[1.02] tracking-tighter2 text-balance text-paper">
+                      <h3 className="serif mt-4 text-[clamp(38px,5vw,72px)] font-medium leading-[1.02] tracking-tighter2 text-balance text-ink">
                         {current.name}
                       </h3>
-                      <p className="mt-6 max-w-[42ch] text-[16px] leading-relaxed text-paper/72 text-pretty md:text-[17px]">
+                      <p className="mt-6 max-w-[42ch] text-[16px] leading-relaxed text-ink-soft text-pretty md:text-[17px]">
                         {current.caption}
                       </p>
                     </motion.div>
@@ -254,14 +248,14 @@ function ImmersiveStage() {
                 </div>
 
                 {/* Scroll affordance */}
-                <div className="mt-10 hidden items-center gap-3 text-[10px] uppercase tracking-eyebrow text-paper/35 md:flex">
+                <div className="mt-10 hidden items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-ink-soft md:flex">
                   <motion.span
                     aria-hidden
-                    className="inline-block h-3 w-px bg-paper/40"
+                    className="inline-block h-3 w-px bg-clay/60"
                     animate={
                       reduce
                         ? undefined
-                        : { scaleY: [0.5, 1, 0.5], opacity: [0.25, 0.7, 0.25] }
+                        : { scaleY: [0.5, 1, 0.5], opacity: [0.35, 0.85, 0.35] }
                     }
                     transition={
                       reduce
@@ -298,13 +292,13 @@ function ImmersiveStage() {
                 );
               })}
 
-              {/* Vignette so canvas blends to the dark frame */}
+              {/* Soft vignette so canvas edges blend into the cream stage */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(80% 100% at 50% 50%, transparent 55%, rgba(15,10,16,0.45) 95%)",
+                    "radial-gradient(85% 100% at 50% 50%, transparent 50%, rgba(248,239,237,0.6) 100%)",
                 }}
               />
             </div>
@@ -316,7 +310,7 @@ function ImmersiveStage() {
               {experiences.map((_, i) => (
                 <div
                   key={`seg-${i}`}
-                  className="relative h-px flex-1 overflow-hidden bg-white/10"
+                  className="relative h-px flex-1 overflow-hidden bg-line/60"
                 >
                   <motion.div
                     className="absolute inset-y-0 left-0 origin-left"
@@ -346,33 +340,32 @@ function ImmersiveStage() {
 }
 
 /**
- * Reduced-motion fallback: three static stacked panels, no pin, no crossfade,
- * no continuous loops. Each panel renders with its `active=false` so the
- * canvases stay still. All three experiences are simultaneously legible.
+ * Reduced-motion fallback: three static stacked panels, no pin, no crossfade.
+ * All on the standard cream theme; canvases render still.
  */
 function ReducedMotionStack() {
   return (
-    <div className="space-y-12 py-8">
+    <div className="space-y-8 px-7 py-12 md:space-y-12 md:px-16 md:py-16">
       {experiences.map((e, i) => {
         const Canvas = e.Canvas;
         return (
           <div
             key={e.name}
-            className="dark-card-lit relative overflow-hidden rounded-3xl border border-bark-deep/40"
+            className="relative overflow-hidden rounded-3xl border border-line bg-paper shadow-soft"
             style={{ background: e.bg }}
           >
             <div className="grid items-center md:grid-cols-[1fr_1.4fr]">
               <div className="p-8 md:p-12">
                 <p
                   className="text-[11px] font-semibold uppercase tracking-[0.32em]"
-                  style={{ color: e.accent + "B3" }}
+                  style={{ color: e.accent }}
                 >
                   {String(i + 1).padStart(2, "0")} · {e.axis}
                 </p>
-                <h3 className="serif mt-3 text-[clamp(28px,3.4vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-paper">
+                <h3 className="serif mt-3 text-[clamp(28px,3.4vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-ink">
                   {e.name}
                 </h3>
-                <p className="mt-4 max-w-[42ch] text-[15px] leading-relaxed text-paper/72 text-pretty">
+                <p className="mt-4 max-w-[42ch] text-[15px] leading-relaxed text-ink-soft text-pretty">
                   {e.caption}
                 </p>
               </div>
@@ -388,9 +381,9 @@ function ReducedMotionStack() {
 }
 
 /* ==========================================================================
-   Canvases — full-screen capable. Each accepts `active` (drives heavy loops
-   only when on stage to save CPU) and `intensity` (0-1, drives subtle scale).
-   All elements respect reduced-motion via `useReducedMotion()`.
+   Canvases — now on the standard cream theme. Strokes use clay / dark blush
+   tones so the linework reads against the soft warm background. Opacities
+   raised modestly since light backgrounds need more pigment than dark ones.
    ========================================================================== */
 
 function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
@@ -419,19 +412,19 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
       >
         <defs>
           <radialGradient id="sw-glow" cx="50%" cy="55%" r="50%">
-            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.45" />
-            <stop offset="40%" stopColor="#D77E91" stopOpacity="0.18" />
+            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.55" />
+            <stop offset="40%" stopColor="#D77E91" stopOpacity="0.20" />
             <stop offset="100%" stopColor="#D77E91" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="sw-shaft" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.18" />
-            <stop offset="60%" stopColor="#F2C3CE" stopOpacity="0.04" />
-            <stop offset="100%" stopColor="#F2C3CE" stopOpacity="0" />
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.55" />
+            <stop offset="60%" stopColor="#FFFFFF" stopOpacity="0.10" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
           </linearGradient>
           <linearGradient id="sw-wave" x1="0" x2="1">
-            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0" />
-            <stop offset="50%" stopColor="#F2C3CE" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#F2C3CE" stopOpacity="0" />
+            <stop offset="0%" stopColor="#B05E76" stopOpacity="0" />
+            <stop offset="50%" stopColor="#B05E76" stopOpacity="0.32" />
+            <stop offset="100%" stopColor="#B05E76" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -454,17 +447,17 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
           style={{ transformOrigin: "300px 165px" }}
         />
 
-        {/* Sediment drifting downward, slowly fading out */}
+        {/* Sediment drifting downward */}
         {sediment.map((s, i) => (
           <motion.circle
             key={`sed-${i}`}
             cx={s.x}
-            r="0.9"
-            fill="#F2C3CE"
+            r="1.1"
+            fill="#B05E76"
             initial={{ cy: -20, opacity: 0 }}
             animate={
               active && !reduce
-                ? { cy: [-20, 620], opacity: [0, 0.35, 0.35, 0] }
+                ? { cy: [-20, 620], opacity: [0, 0.45, 0.45, 0] }
                 : undefined
             }
             transition={
@@ -481,7 +474,7 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
           />
         ))}
 
-        {/* Three softly undulating horizon lines */}
+        {/* Three undulating horizon lines */}
         {[324, 330, 336].map((y, i) => (
           <motion.line
             key={`wave-${i}`}
@@ -490,10 +483,10 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
             y1={y}
             y2={y}
             stroke="url(#sw-wave)"
-            strokeWidth="1"
+            strokeWidth="1.1"
             animate={
               active && !reduce
-                ? { x1: [-30, 30, -30], opacity: [0.4, 0.9, 0.4] }
+                ? { x1: [-30, 30, -30], opacity: [0.5, 0.95, 0.5] }
                 : undefined
             }
             transition={
@@ -517,8 +510,8 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
             cy="330"
             r="20"
             fill="none"
-            stroke="#F2C3CE"
-            strokeWidth="0.9"
+            stroke="#B05E76"
+            strokeWidth="1.1"
             initial={{ opacity: 0, scale: 0.6 }}
             animate={
               active && !reduce
@@ -539,20 +532,20 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
           />
         ))}
 
-        {/* Rising bubbles from the impact point */}
+        {/* Rising bubbles */}
         {bubbles.map((b, i) => (
           <motion.circle
             key={`bub-${i}`}
             cx={b.x}
-            r="2.2"
+            r="2.4"
             fill="none"
-            stroke="#F2C3CE"
-            strokeOpacity="0.6"
-            strokeWidth="0.7"
+            stroke="#8E3F52"
+            strokeOpacity="0.55"
+            strokeWidth="0.9"
             initial={{ cy: 330, opacity: 0, scale: 0.6 }}
             animate={
               active && !reduce
-                ? { cy: [330, 80], opacity: [0, 0.7, 0], scale: [0.6, 1, 1.3] }
+                ? { cy: [330, 80], opacity: [0, 0.65, 0], scale: [0.6, 1, 1.3] }
                 : undefined
             }
             transition={
@@ -574,7 +567,7 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
           cx="300"
           cy="330"
           r="6"
-          fill="#F2C3CE"
+          fill="#8E3F52"
           opacity={0.95}
           animate={
             active && !reduce
@@ -589,7 +582,7 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
           style={{ transformOrigin: "300px 330px" }}
         />
 
-        {/* Faint specks suspended in the dark */}
+        {/* Suspended specks */}
         {[
           [120, 200],
           [480, 220],
@@ -604,12 +597,12 @@ function StillWaterCanvas({ active }: { active: boolean; intensity: number }) {
             key={`s-${i}`}
             cx={cx}
             cy={cy}
-            r="1.2"
-            fill="#F2C3CE"
-            opacity="0.35"
+            r="1.4"
+            fill="#B05E76"
+            opacity="0.5"
             animate={
               active && !reduce
-                ? { opacity: [0.1, 0.55, 0.1] }
+                ? { opacity: [0.2, 0.7, 0.2] }
                 : undefined
             }
             transition={
@@ -632,7 +625,6 @@ function CosmicBreathCanvas({
 }) {
   const reduce = useReducedMotion();
   const ringCount = 12;
-  // Constellation: 7 stars with hand-picked positions, plus the connecting edges
   const stars = [
     [128, 138],
     [186, 92],
@@ -643,21 +635,13 @@ function CosmicBreathCanvas({
     [468, 322],
   ] as const;
   const edges: Array<[number, number]> = [
-    [0, 1],
-    [1, 2],
-    [2, 3],
-    [3, 4],
-    [4, 5],
-    [5, 6],
-    [2, 5],
+    [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [2, 5],
   ];
-  // Spiral particles orbiting at three radii
   const spirals = [
     { r: 140, dur: 22, delay: 0 },
     { r: 200, dur: 30, delay: 3 },
     { r: 260, dur: 38, delay: 7 },
   ];
-  // Shooting star paths
   const shooters = [
     { x: 30, y: 80, dx: 320, dy: 120, dur: 4, delay: 6 },
     { x: 540, y: 110, dx: -260, dy: 80, dur: 5, delay: 14 },
@@ -673,23 +657,23 @@ function CosmicBreathCanvas({
       >
         <defs>
           <radialGradient id="cb-core-bg" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.55" />
-            <stop offset="40%" stopColor="#B05E76" stopOpacity="0.16" />
+            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.65" />
+            <stop offset="40%" stopColor="#B05E76" stopOpacity="0.20" />
             <stop offset="100%" stopColor="#B05E76" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="cb-flare" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.7" />
-            <stop offset="60%" stopColor="#F2C3CE" stopOpacity="0.3" />
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.85" />
+            <stop offset="60%" stopColor="#F2C3CE" stopOpacity="0.45" />
             <stop offset="100%" stopColor="#F2C3CE" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="cb-nebula" cx="30%" cy="30%" r="60%">
-            <stop offset="0%" stopColor="#E5A6B5" stopOpacity="0.22" />
-            <stop offset="60%" stopColor="#B05E76" stopOpacity="0.06" />
+            <stop offset="0%" stopColor="#E5A6B5" stopOpacity="0.28" />
+            <stop offset="60%" stopColor="#B05E76" stopOpacity="0.10" />
             <stop offset="100%" stopColor="#B05E76" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="cb-trail" x1="0" x2="1">
-            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
-            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.85" />
+            <stop offset="0%" stopColor="#8E3F52" stopOpacity="0" />
+            <stop offset="100%" stopColor="#8E3F52" stopOpacity="0.9" />
           </linearGradient>
         </defs>
 
@@ -708,24 +692,21 @@ function CosmicBreathCanvas({
 
         <rect width="600" height="600" fill="url(#cb-core-bg)" />
 
-        {/* Constellation edges — draw in via dasharray */}
+        {/* Constellation edges */}
         {edges.map(([a, b], i) => {
           const [x1, y1] = stars[a];
           const [x2, y2] = stars[b];
           return (
             <motion.line
               key={`edge-${i}`}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#F2C3CE"
-              strokeOpacity="0.5"
-              strokeWidth="0.5"
+              x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke="#8E3F52"
+              strokeOpacity="0.55"
+              strokeWidth="0.6"
               strokeDasharray="220"
               animate={
                 active && !reduce
-                  ? { strokeDashoffset: [220, 0, 0, 220], opacity: [0, 0.6, 0.6, 0] }
+                  ? { strokeDashoffset: [220, 0, 0, 220], opacity: [0, 0.7, 0.7, 0] }
                   : undefined
               }
               transition={
@@ -747,14 +728,13 @@ function CosmicBreathCanvas({
         {stars.map(([x, y], i) => (
           <motion.circle
             key={`con-${i}`}
-            cx={x}
-            cy={y}
-            r="2.2"
-            fill="#FFFFFF"
-            opacity="0.8"
+            cx={x} cy={y}
+            r="2.4"
+            fill="#8E3F52"
+            opacity="0.85"
             animate={
               active && !reduce
-                ? { opacity: [0.3, 1, 0.3], scale: [1, 1.3, 1] }
+                ? { opacity: [0.35, 1, 0.35], scale: [1, 1.3, 1] }
                 : undefined
             }
             transition={
@@ -772,13 +752,11 @@ function CosmicBreathCanvas({
           return (
             <motion.circle
               key={i}
-              cx="300"
-              cy="300"
-              r={r}
+              cx="300" cy="300" r={r}
               fill="none"
-              stroke="#F2C3CE"
-              strokeOpacity={Math.max(0.04, 0.55 - i * 0.04)}
-              strokeWidth="0.6"
+              stroke="#B05E76"
+              strokeOpacity={Math.max(0.06, 0.55 - i * 0.04)}
+              strokeWidth="0.7"
               animate={
                 active && !reduce
                   ? { scale: [1, 1.18, 1], opacity: [0.4, 0.85, 0.4] }
@@ -794,7 +772,7 @@ function CosmicBreathCanvas({
           );
         })}
 
-        {/* Spiral particles orbiting at three radii */}
+        {/* Spiral particles */}
         {spirals.map((s, i) => (
           <motion.g
             key={`spiral-${i}`}
@@ -806,16 +784,14 @@ function CosmicBreathCanvas({
             }
             style={{ transformOrigin: "300px 300px" }}
           >
-            <circle cx={300 + s.r} cy="300" r="2" fill="#F2C3CE" opacity="0.85" />
-            <circle cx={300 + s.r} cy="300" r="8" fill="none" stroke="#F2C3CE" strokeOpacity="0.25" />
+            <circle cx={300 + s.r} cy="300" r="2.4" fill="#8E3F52" opacity="0.9" />
+            <circle cx={300 + s.r} cy="300" r="9" fill="none" stroke="#B05E76" strokeOpacity="0.35" />
           </motion.g>
         ))}
 
         {/* Core flare */}
         <motion.circle
-          cx="300"
-          cy="300"
-          r="64"
+          cx="300" cy="300" r="64"
           fill="url(#cb-flare)"
           animate={
             active && !reduce
@@ -831,9 +807,9 @@ function CosmicBreathCanvas({
         />
 
         {/* Hot center point */}
-        <circle cx="300" cy="300" r="4" fill="#FFFFFF" opacity="0.9" />
+        <circle cx="300" cy="300" r="4" fill="#8E3F52" />
 
-        {/* Shooting stars — translate diagonally with a fading trail */}
+        {/* Shooting stars */}
         {shooters.map((s, i) => (
           <motion.g
             key={`shoot-${i}`}
@@ -861,32 +837,32 @@ function CosmicBreathCanvas({
               x2={s.x - 40 * (s.dx > 0 ? 1 : -1)}
               y2={s.y - 14 * (s.dy > 0 ? 1 : -1)}
               stroke="url(#cb-trail)"
-              strokeWidth="1.2"
+              strokeWidth="1.4"
               strokeLinecap="round"
             />
-            <circle cx={s.x} cy={s.y} r="1.5" fill="#FFFFFF" />
+            <circle cx={s.x} cy={s.y} r="2" fill="#8E3F52" />
           </motion.g>
         ))}
 
-        {/* Particle field — slow-twinkling background stars */}
+        {/* Background twinkle */}
         {[
-          [90, 90, 0.8],
-          [520, 110, 0.7],
-          [550, 480, 0.5],
-          [70, 510, 0.6],
-          [200, 70, 0.4],
-          [480, 540, 0.6],
-          [40, 280, 0.5],
-          [560, 290, 0.45],
-          [110, 410, 0.4],
-          [560, 380, 0.5],
+          [90, 90, 0.5],
+          [520, 110, 0.45],
+          [550, 480, 0.35],
+          [70, 510, 0.4],
+          [200, 70, 0.3],
+          [480, 540, 0.4],
+          [40, 280, 0.35],
+          [560, 290, 0.32],
+          [110, 410, 0.3],
+          [560, 380, 0.35],
         ].map(([cx, cy, op], i) => (
           <motion.circle
             key={`star-${i}`}
             cx={cx as number}
             cy={cy as number}
-            r="1.4"
-            fill="#FFFFFF"
+            r="1.6"
+            fill="#B05E76"
             opacity={op as number}
             animate={
               active && !reduce
@@ -907,16 +883,13 @@ function CosmicBreathCanvas({
 
 function AxisCanvas({ active }: { active: boolean; intensity: number }) {
   const reduce = useReducedMotion();
-
-  // Field lines radiating from center every 30deg
   const fieldLines = Array.from({ length: 12 }, (_, i) => (i * 360) / 12);
-  // Five orbiting bodies on different orbits
   const bodies = [
-    { rx: 220, ry: 115, ang: 0, dur: 14, dir: 1, r: 6, fill: "#F2C3CE", trailArc: 110 },
-    { rx: 115, ry: 220, ang: 90, dur: 19, dir: -1, r: 4, fill: "#E5A6B5", trailArc: 80 },
-    { rx: 180, ry: 180, ang: 45, dur: 24, dir: 1, r: 3, fill: "#FFFFFF", trailArc: 90 },
-    { rx: 80, ry: 80, ang: 200, dur: 9, dir: -1, r: 2.5, fill: "#F2C3CE", trailArc: 60 },
-    { rx: 270, ry: 60, ang: 130, dur: 30, dir: 1, r: 2, fill: "#D77E91", trailArc: 70 },
+    { rx: 220, ry: 115, ang: 0, dur: 14, dir: 1, r: 6, fill: "#8E3F52", trailArc: 110 },
+    { rx: 115, ry: 220, ang: 90, dur: 19, dir: -1, r: 4, fill: "#A24F62", trailArc: 80 },
+    { rx: 180, ry: 180, ang: 45, dur: 24, dir: 1, r: 3, fill: "#B05E76", trailArc: 90 },
+    { rx: 80, ry: 80, ang: 200, dur: 9, dir: -1, r: 2.5, fill: "#8E3F52", trailArc: 60 },
+    { rx: 270, ry: 60, ang: 130, dur: 30, dir: 1, r: 2, fill: "#A24F62", trailArc: 70 },
   ];
 
   return (
@@ -929,46 +902,36 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
       >
         <defs>
           <radialGradient id="ax-glow" cx="50%" cy="50%" r="55%">
-            <stop offset="0%" stopColor="#D77E91" stopOpacity="0.32" />
-            <stop offset="60%" stopColor="#D77E91" stopOpacity="0.08" />
+            <stop offset="0%" stopColor="#D77E91" stopOpacity="0.40" />
+            <stop offset="60%" stopColor="#D77E91" stopOpacity="0.12" />
             <stop offset="100%" stopColor="#D77E91" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="ax-field" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#F2C3CE" stopOpacity="0.0" />
-            <stop offset="60%" stopColor="#F2C3CE" stopOpacity="0.30" />
-            <stop offset="100%" stopColor="#F2C3CE" stopOpacity="0" />
+            <stop offset="0%" stopColor="#B05E76" stopOpacity="0" />
+            <stop offset="60%" stopColor="#B05E76" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#B05E76" stopOpacity="0" />
           </linearGradient>
         </defs>
 
         <rect width="600" height="600" fill="url(#ax-glow)" />
 
-        {/* Soft grid suggestion */}
+        {/* Soft grid */}
         {[180, 300, 420].map((g) => (
           <line
             key={`gv-${g}`}
-            x1={g}
-            x2={g}
-            y1="100"
-            y2="500"
-            stroke="#F2C3CE"
-            strokeOpacity="0.05"
-            strokeWidth="0.8"
+            x1={g} x2={g} y1="100" y2="500"
+            stroke="#B05E76" strokeOpacity="0.08" strokeWidth="0.8"
           />
         ))}
         {[180, 300, 420].map((g) => (
           <line
             key={`gh-${g}`}
-            y1={g}
-            y2={g}
-            x1="100"
-            x2="500"
-            stroke="#F2C3CE"
-            strokeOpacity="0.05"
-            strokeWidth="0.8"
+            y1={g} y2={g} x1="100" x2="500"
+            stroke="#B05E76" strokeOpacity="0.08" strokeWidth="0.8"
           />
         ))}
 
-        {/* Rotating crosshair guides — extremely slow */}
+        {/* Crosshair guides */}
         <motion.g
           animate={active && !reduce ? { rotate: 360 } : undefined}
           transition={
@@ -978,24 +941,21 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
           }
           style={{ transformOrigin: "300px 300px" }}
         >
-          <line x1="100" y1="300" x2="500" y2="300" stroke="#F2C3CE" strokeOpacity="0.08" strokeWidth="0.6" />
-          <line x1="300" y1="100" x2="300" y2="500" stroke="#F2C3CE" strokeOpacity="0.08" strokeWidth="0.6" />
+          <line x1="100" y1="300" x2="500" y2="300" stroke="#B05E76" strokeOpacity="0.12" strokeWidth="0.7" />
+          <line x1="300" y1="100" x2="300" y2="500" stroke="#B05E76" strokeOpacity="0.12" strokeWidth="0.7" />
         </motion.g>
 
-        {/* Magnetic field lines emanating from center */}
+        {/* Magnetic field lines */}
         {fieldLines.map((deg, i) => (
           <motion.line
             key={`field-${i}`}
-            x1="300"
-            y1="300"
-            x2="450"
-            y2="300"
+            x1="300" y1="300" x2="450" y2="300"
             stroke="url(#ax-field)"
-            strokeWidth="0.6"
+            strokeWidth="0.7"
             style={{ transformOrigin: "300px 300px", transform: `rotate(${deg}deg)` }}
             animate={
               active && !reduce
-                ? { opacity: [0.1, 0.5, 0.1] }
+                ? { opacity: [0.15, 0.6, 0.15] }
                 : undefined
             }
             transition={
@@ -1006,22 +966,18 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
           />
         ))}
 
-        {/* Four orbit guide lines */}
-        <ellipse cx="300" cy="300" rx="220" ry="115" fill="none" stroke="#F2C3CE" strokeOpacity="0.32" strokeWidth="0.9" />
-        <ellipse cx="300" cy="300" rx="115" ry="220" fill="none" stroke="#F2C3CE" strokeOpacity="0.18" strokeWidth="0.9" />
-        <ellipse cx="300" cy="300" rx="180" ry="180" fill="none" stroke="#F2C3CE" strokeOpacity="0.10" strokeWidth="0.7" />
-        <ellipse cx="300" cy="300" rx="270" ry="60" fill="none" stroke="#F2C3CE" strokeOpacity="0.10" strokeWidth="0.7" />
-        <circle cx="300" cy="300" r="80" fill="none" stroke="#F2C3CE" strokeOpacity="0.10" strokeWidth="0.8" />
+        {/* Orbit guides */}
+        <ellipse cx="300" cy="300" rx="220" ry="115" fill="none" stroke="#B05E76" strokeOpacity="0.40" strokeWidth="0.9" />
+        <ellipse cx="300" cy="300" rx="115" ry="220" fill="none" stroke="#B05E76" strokeOpacity="0.25" strokeWidth="0.9" />
+        <ellipse cx="300" cy="300" rx="180" ry="180" fill="none" stroke="#B05E76" strokeOpacity="0.16" strokeWidth="0.7" />
+        <ellipse cx="300" cy="300" rx="270" ry="60" fill="none" stroke="#B05E76" strokeOpacity="0.16" strokeWidth="0.7" />
+        <circle cx="300" cy="300" r="80" fill="none" stroke="#B05E76" strokeOpacity="0.16" strokeWidth="0.8" />
 
-        {/* Center point with double pulsing reticle */}
-        <circle cx="300" cy="300" r="4" fill="#D77E91" />
+        {/* Center reticle */}
+        <circle cx="300" cy="300" r="4" fill="#8E3F52" />
         <motion.circle
-          cx="300"
-          cy="300"
-          r="14"
-          fill="none"
-          stroke="#D77E91"
-          strokeOpacity="0.45"
+          cx="300" cy="300" r="14"
+          fill="none" stroke="#8E3F52" strokeOpacity="0.55"
           animate={active && !reduce ? { scale: [1, 1.25, 1] } : undefined}
           transition={
             active && !reduce
@@ -1032,12 +988,8 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
         />
         {/* Sonar ping */}
         <motion.circle
-          cx="300"
-          cy="300"
-          r="14"
-          fill="none"
-          stroke="#D77E91"
-          strokeWidth="0.6"
+          cx="300" cy="300" r="14"
+          fill="none" stroke="#8E3F52" strokeWidth="0.7"
           initial={{ opacity: 0, scale: 1 }}
           animate={
             active && !reduce
@@ -1052,7 +1004,7 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
           style={{ transformOrigin: "300px 300px" }}
         />
 
-        {/* Orbiting bodies with motion trails */}
+        {/* Orbiting bodies with trails */}
         {bodies.map((b, i) => {
           const trailEnd = b.ang - b.dir * b.trailArc;
           const trailPath = arcPath(b.rx, b.ry, b.ang, trailEnd, b.dir);
@@ -1071,12 +1023,10 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
               }
               style={{ transformOrigin: "300px 300px" }}
             >
-              {/* Trail */}
-              <path d={trailPath} fill="none" stroke={b.fill} strokeOpacity="0.35" strokeWidth="1.2" strokeLinecap="round" />
-              {/* Body */}
+              <path d={trailPath} fill="none" stroke={b.fill} strokeOpacity="0.40" strokeWidth="1.3" strokeLinecap="round" />
               <circle cx={300 + b.rx * Math.cos((b.ang * Math.PI) / 180)} cy={300 + b.ry * Math.sin((b.ang * Math.PI) / 180)} r={b.r} fill={b.fill} />
               {b.r >= 4 ? (
-                <circle cx={300 + b.rx * Math.cos((b.ang * Math.PI) / 180)} cy={300 + b.ry * Math.sin((b.ang * Math.PI) / 180)} r={b.r + 6} fill="none" stroke={b.fill} strokeOpacity="0.4" />
+                <circle cx={300 + b.rx * Math.cos((b.ang * Math.PI) / 180)} cy={300 + b.ry * Math.sin((b.ang * Math.PI) / 180)} r={b.r + 6} fill="none" stroke={b.fill} strokeOpacity="0.45" />
               ) : null}
             </motion.g>
           );
@@ -1086,10 +1036,6 @@ function AxisCanvas({ active }: { active: boolean; intensity: number }) {
   );
 }
 
-/**
- * Build an SVG arc path from one angle to another on an ellipse.
- * Used to draw motion trails behind orbiting bodies.
- */
 function arcPath(rx: number, ry: number, fromDeg: number, toDeg: number, dir: number) {
   const rad = (deg: number) => (deg * Math.PI) / 180;
   const x1 = 300 + rx * Math.cos(rad(fromDeg));
