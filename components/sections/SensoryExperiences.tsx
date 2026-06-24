@@ -60,7 +60,7 @@ export function SensoryExperiences() {
       {/* Section intro */}
       <div className="shell pt-24 md:pt-32">
         <Reveal as="div" className="max-w-2xl">
-          <Eyebrow index="03">Sensory experiences</Eyebrow>
+          <Eyebrow index="04">Sensory experiences</Eyebrow>
           <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
             Regulation, <em className="italic">made immersive.</em>
           </h2>
@@ -178,8 +178,8 @@ function ImmersiveStage() {
             {/* LEFT: Text panel */}
             <div className="z-10 flex items-center px-7 md:px-16 lg:px-24">
               <div className="relative w-full max-w-[420px]">
-                {/* Numbered progress glyphs */}
-                <div className="flex items-end gap-5">
+                {/* Numbered progress glyphs — ≥44px tap target via padding */}
+                <div className="-ml-2 flex items-end gap-1">
                   {experiences.map((_, i) => (
                     <button
                       key={i}
@@ -195,10 +195,10 @@ function ImmersiveStage() {
                         window.scrollTo({ top, behavior: "smooth" });
                       }}
                       className={cn(
-                        "serif text-[14px] italic transition-all duration-500",
+                        "serif min-h-[44px] min-w-[44px] px-2 py-2 text-[14px] italic transition-all duration-500",
                         stageIdx === i
                           ? "text-amber-soft"
-                          : "text-paper/30 hover:text-paper/55",
+                          : "text-paper/40 hover:text-paper/70",
                       )}
                       style={{
                         transform: stageIdx === i ? "translateY(-4px)" : "none",

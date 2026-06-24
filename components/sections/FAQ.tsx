@@ -15,7 +15,7 @@ export function FAQ() {
     <section id="faq" className="relative py-24 md:py-32">
       <div className="shell max-w-4xl">
         <Reveal as="div">
-          <Eyebrow index="07">Questions</Eyebrow>
+          <Eyebrow>Questions</Eyebrow>
           <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
             What you might be <em className="italic">wondering.</em>
           </h2>

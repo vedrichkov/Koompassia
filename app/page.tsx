@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/sections/Hero";
-import { DemoPreview } from "@/components/sections/DemoPreview";
+// DemoPreview removed in P2: the "Coming soon" placeholder was actively
+// suppressing intent. Re-add the import + section below Hero once real
+// screenshots and demo video land in /public.
+// import { DemoPreview } from "@/components/sections/DemoPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { NervousSystemIntel } from "@/components/sections/NervousSystemIntel";
 import { AdaptiveAtmosphere } from "@/components/sections/AdaptiveAtmosphere";
@@ -49,7 +52,6 @@ export default function HomePage() {
     <>
       <div data-act="surface">
         <Hero />
-        <DemoPreview />
         <HowItWorks />
         <NervousSystemIntel />
       </div>

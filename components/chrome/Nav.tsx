@@ -49,7 +49,7 @@ export function Nav() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-[14px] text-ink-soft transition-colors duration-300 hover:text-clay"
+              className="inline-flex min-h-[44px] items-center text-[14px] text-ink/80 transition-colors duration-300 hover:text-clay"
             >
               {l.label}
             </Link>
@@ -59,7 +59,7 @@ export function Nav() {
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/practitioners"
-            className="hidden text-[13px] text-ink-faint transition-colors duration-300 hover:text-clay md:inline"
+            className="hidden min-h-[44px] items-center text-[13px] text-ink-soft transition-colors duration-300 hover:text-clay md:inline-flex"
           >
             For practitioners
           </Link>

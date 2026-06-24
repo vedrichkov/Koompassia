@@ -8,7 +8,7 @@ export function CloseTheLoop() {
       <div className="shell">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.05fr] md:gap-16">
           <Reveal as="div" from="left">
-            <Eyebrow index="05">Close the loop</Eyebrow>
+            <Eyebrow index="06">Close the loop</Eyebrow>
             <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
               See what is working. <em className="italic">See what is changing.</em>
             </h2>

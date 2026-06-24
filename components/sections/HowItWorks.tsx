@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
+import { SectionCTA } from "@/components/primitives/SectionCTA";
 import { TRIGGER } from "@/lib/motion-tokens";
 import { cn } from "@/lib/cn";
 
@@ -129,6 +130,12 @@ export function HowItWorks() {
             ))}
           </ol>
         </div>
+
+        {/* Repeat CTA at peak comprehension (Pass 2 #5) */}
+        <SectionCTA
+          prompt="Ready?"
+          sub="Free forever. No card. iPhone and Apple Watch."
+        />
       </div>
     </section>
   );
