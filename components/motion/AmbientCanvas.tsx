@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { subscribeDarkness } from "@/lib/act-store";
 
 /**
  * AmbientCanvas — single fixed full-viewport WebGL layer behind all content.
@@ -175,6 +176,13 @@ export function AmbientCanvas() {
       };
       window.addEventListener("scroll", onScroll, { passive: true });
 
+      // Subscribe to act-driven darkness changes from the ActDirector.
+      // GSAP tweens the proxy; we write the latest into the shader uniform
+      // on every change. The rAF tick will pick it up on the next frame.
+      const unsubscribeDarkness = subscribeDarkness((v) => {
+        program.uniforms.uDarkness.value = v;
+      });
+
       let raf = 0;
       let running = true;
       let start = performance.now();
@@ -210,6 +218,7 @@ export function AmbientCanvas() {
         window.removeEventListener("resize", resize);
         window.removeEventListener("scroll", onScroll);
         document.removeEventListener("visibilitychange", onVis);
+        unsubscribeDarkness();
         gl.canvas.remove();
       };
     })();

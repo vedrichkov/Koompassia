@@ -7,6 +7,7 @@ import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { AmbientCanvas } from "@/components/motion/AmbientCanvas";
+import { ActDirector } from "@/components/motion/ActDirector";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -136,6 +137,7 @@ export default function RootLayout({
         <AmbientCanvas />
         <SmoothScroll />
         <ScrollProgress />
+        <ActDirector />
         <Nav />
         <main id="main">{children}</main>
         <Footer />

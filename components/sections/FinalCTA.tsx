@@ -7,6 +7,7 @@ export function FinalCTA() {
       <div className="shell">
         <Reveal as="div">
           <CTABand
+            closing
             eyebrow="Begin"
             headline={
               <>

@@ -8,29 +8,42 @@ import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { TRIGGER } from "@/lib/motion-tokens";
 import { cn } from "@/lib/cn";
 
+// Day-in-the-life sequence — each step is a concrete moment with a
+// time, an action and an outcome. Replaces the previous abstract
+// 4-step ("Sense / Understand / Receive / Build") per Phase 3 brief:
+// "Replace the abstract how-it-works steps with a literal
+// day-in-the-life sequence."
 const steps = [
   {
     n: "01",
-    title: "Sense your state",
-    body: "Sensor data, body signals and your reflections, woven into a real-time read of how your system is regulating.",
+    time: "7:14 am",
+    title: "Morning brief.",
+    body: "Overnight HRV reads recovered. Today is a Focus day. Koompassia opens with one anchor practice: a 90-second box breath.",
+    outcome: "90 seconds · before the inbox.",
     Glyph: SenseGlyph,
   },
   {
     n: "02",
-    title: "Understand your patterns",
-    body: "The intelligence layer finds the timing, habits and rhythms behind your steadiest days. It learns what your body already knows.",
+    time: "10:48 am",
+    title: "Pre-meeting nudge.",
+    body: "Calendar shows a hard 1:1 at 11:00. Heart rate is climbing. Watch taps your wrist: a single screen, a single move.",
+    outcome: "3-minute breath. Lands before the meeting, not after.",
     Glyph: PatternGlyph,
   },
   {
     n: "03",
-    title: "Receive adaptive guidance",
-    body: "The AI coaching adjusts tone, timing and recommendations to your state, so each prompt arrives ready to land.",
+    time: "3:30 pm",
+    title: "Mindful walk.",
+    body: "Energy dips. A 4-minute walk routes you outside; the Watch tracks pace and HRV; the Score recalibrates as you settle.",
+    outcome: "+6 NRS after the loop. Back to your desk steadier.",
     Glyph: GuidanceGlyph,
   },
   {
     n: "04",
-    title: "Build steadiness over time",
-    body: "Every action loops back into a living model. Discipline strengthens because it grows from understanding, not force.",
+    time: "Sunday",
+    title: "Weekly trend.",
+    body: "Your Path shows 18 steady days of 28, with HRV trending +4%. The Discipline Architect adjusts next week's anchor.",
+    outcome: "One number you learn to trust.",
     Glyph: SteadinessGlyph,
   },
 ];
@@ -72,12 +85,13 @@ export function HowItWorks() {
     <section id="how" className="relative py-24 md:py-32">
       <div className="shell">
         <div className="max-w-2xl">
-          <Eyebrow index="01">How it works</Eyebrow>
+          <Eyebrow index="01">A day with Koompassia</Eyebrow>
           <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
-            Intelligence that <em className="italic">adapts to you.</em>
+            Four small moments. <em className="italic">One steady week.</em>
           </h2>
           <p className="mt-5 text-[17px] leading-relaxed text-ink-soft text-pretty">
-            Not a system to push through. A loop that learns you, then meets you where you are.
+            Not a system to push through. Four nudges across the day that
+            arrive when they help, so discipline grows from understanding.
           </p>
         </div>
 
@@ -104,7 +118,7 @@ export function HowItWorks() {
                 />
               </div>
               <div className="mt-6 text-[11px] font-semibold uppercase tracking-eyebrow text-amber">
-                Living loop
+                A typical day
               </div>
             </div>
           </div>
@@ -124,7 +138,14 @@ function Step({
   step,
   index,
 }: {
-  step: { n: string; title: string; body: string; Glyph: React.FC };
+  step: {
+    n: string;
+    time: string;
+    title: string;
+    body: string;
+    outcome: string;
+    Glyph: React.FC;
+  };
   index: number;
 }) {
   const { Glyph } = step;
@@ -136,9 +157,14 @@ function Step({
       style={{ animationDelay: `${index * 0.08}s` }}
     >
       <div className="grid grid-cols-[auto_1fr] items-start gap-6 md:grid-cols-[auto_1fr_120px] md:gap-8">
-        <span className="serif text-[36px] font-medium leading-none tracking-[-0.04em] text-clay/70 tabular-nums">
-          {step.n}
-        </span>
+        <div className="flex flex-col">
+          <span className="serif text-[36px] font-medium leading-none tracking-[-0.04em] text-clay/70 tabular-nums">
+            {step.n}
+          </span>
+          <span className="mt-2 text-[10px] font-semibold uppercase tracking-eyebrow text-amber">
+            {step.time}
+          </span>
+        </div>
         <div>
           <h3 className="serif text-[24px] font-medium leading-[1.15] tracking-tightish text-ink">
             {step.title}
@@ -146,8 +172,11 @@ function Step({
           <p className="mt-3 max-w-prose text-[15.5px] leading-relaxed text-ink-soft text-pretty">
             {step.body}
           </p>
+          <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-line-soft bg-cream-2/40 px-3 py-1.5 text-[12px] font-medium text-clay">
+            <span aria-hidden className="h-1 w-1 rounded-full bg-clay" />
+            {step.outcome}
+          </p>
         </div>
-        {/* Mini glyph aligned right on desktop */}
         <div className="col-span-2 hidden h-16 md:col-span-1 md:block">
           <Glyph />
         </div>

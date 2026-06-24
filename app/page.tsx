@@ -33,23 +33,46 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Page restructured into the four-act narrative spine.
+ * The `data-act` attribute on each wrapper is the contract with the
+ * ActDirector: as each act enters the viewport it tweens the ambient
+ * canvas's uDarkness toward that act's target intensity.
+ *
+ *   Act I  — Surface       (light)              Your everyday + the score.
+ *   Act II — Mechanism     (light, warming)     How it works on you.
+ *   Act III — Interior     (DARK)               Inside the nervous system.
+ *   Act IV — Resurface     (light)              Back to your life, equipped.
+ */
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <DemoPreview />
-      <HowItWorks />
-      <NervousSystemIntel />
-      <AdaptiveAtmosphere />
-      <SensoryExperiences />
-      <EmbodiedPractices />
-      <CloseTheLoop />
-      <AppleWatch />
-      <Science />
-      <Privacy />
-      <Pricing />
-      <FAQ />
-      <FinalCTA />
+      <div data-act="surface">
+        <Hero />
+        <DemoPreview />
+        <HowItWorks />
+        <NervousSystemIntel />
+      </div>
+
+      <div data-act="mechanism">
+        <AdaptiveAtmosphere />
+        <EmbodiedPractices />
+      </div>
+
+      <div data-act="interior">
+        <SensoryExperiences />
+        <AppleWatch />
+      </div>
+
+      <div data-act="resurface">
+        <CloseTheLoop />
+        <Science />
+        <Privacy />
+        <Pricing />
+        <FAQ />
+        <FinalCTA />
+      </div>
+
       <MobileAppJsonLd />
       <FAQJsonLd items={FAQ_ITEMS} />
       <BreadcrumbsJsonLd items={[{ name: "Home", href: "/" }]} />
