@@ -36,8 +36,10 @@ export function Footer() {
       <div className="shell py-16">
         <div className="grid gap-12 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="max-w-sm">
-            <Link href="/" className="flex items-center gap-2.5">
-              <BrandMark size={28} />
+            <Link href="/" className="group inline-flex items-center gap-2.5">
+              <span className="brand-mark-pulse inline-block transition-transform duration-500 group-hover:scale-110">
+                <BrandMark size={28} />
+              </span>
               <span className="serif text-[20px] font-medium tracking-tightish">Koompassia</span>
             </Link>
             <p className="mt-4 text-[14px] leading-relaxed text-ink-soft text-pretty">

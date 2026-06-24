@@ -10,21 +10,25 @@ const steps = [
     n: "01",
     title: "Sense your state",
     body: "Sensor data, body signals and your reflections, woven into a real-time read of how your system is regulating.",
+    Glyph: SenseGlyph,
   },
   {
     n: "02",
     title: "Understand your patterns",
     body: "The intelligence layer finds the timing, habits and rhythms behind your steadiest days. It learns what your body already knows.",
+    Glyph: PatternGlyph,
   },
   {
     n: "03",
     title: "Receive adaptive guidance",
     body: "The AI coaching adjusts tone, timing and recommendations to your state, so each prompt arrives ready to land.",
+    Glyph: GuidanceGlyph,
   },
   {
     n: "04",
     title: "Build steadiness over time",
     body: "Every action loops back into a living model. Discipline strengthens because it grows from understanding, not force.",
+    Glyph: SteadinessGlyph,
   },
 ];
 
@@ -36,6 +40,8 @@ export function HowItWorks() {
     offset: ["start 70%", "end 30%"],
   });
   const progressHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  // Moving dot on the progress rail
+  const dotY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section id="how" className="relative py-24 md:py-32">
@@ -57,10 +63,15 @@ export function HowItWorks() {
           {/* Sticky step indicator */}
           <div className="hidden md:block">
             <div className="sticky top-32">
-              <div className="relative ml-4 h-[280px] w-[2px] overflow-hidden rounded-full bg-line">
+              <div className="relative ml-4 h-[320px] w-[2px] overflow-visible rounded-full bg-line">
                 <motion.div
                   className="absolute inset-x-0 top-0 rounded-full bg-clay/80"
                   style={{ height: reduce ? "100%" : progressHeight }}
+                />
+                {/* Moving dot that travels with scroll */}
+                <motion.div
+                  className="absolute -left-[5px] h-3 w-3 rounded-full border-2 border-paper bg-clay shadow-soft"
+                  style={{ top: reduce ? "100%" : dotY, transform: "translateY(-50%)" }}
                 />
               </div>
               <div className="mt-6 text-[11px] font-semibold uppercase tracking-eyebrow text-amber">
@@ -84,18 +95,19 @@ function Step({
   step,
   index,
 }: {
-  step: { n: string; title: string; body: string };
+  step: { n: string; title: string; body: string; Glyph: React.FC };
   index: number;
 }) {
+  const { Glyph } = step;
   return (
     <li
       className={cn(
-        "reveal group relative overflow-hidden rounded-3xl border border-line bg-paper p-8 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-lift md:p-10",
+        "reveal group relative overflow-hidden rounded-3xl border border-line bg-paper p-7 shadow-soft transition-all duration-500 hover:-translate-y-1 hover:shadow-lift md:p-9",
       )}
       style={{ animationDelay: `${index * 0.08}s` }}
     >
-      <div className="flex items-start gap-6">
-        <span className="serif text-[34px] font-medium leading-none tracking-[-0.04em] text-clay/70 tabular-nums">
+      <div className="grid grid-cols-[auto_1fr] items-start gap-6 md:grid-cols-[auto_1fr_120px] md:gap-8">
+        <span className="serif text-[36px] font-medium leading-none tracking-[-0.04em] text-clay/70 tabular-nums">
           {step.n}
         </span>
         <div>
@@ -106,11 +118,164 @@ function Step({
             {step.body}
           </p>
         </div>
+        {/* Mini glyph aligned right on desktop */}
+        <div className="col-span-2 hidden h-16 md:col-span-1 md:block">
+          <Glyph />
+        </div>
       </div>
       <div
         aria-hidden
         className="absolute inset-x-8 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-amber/0 via-amber/60 to-amber/0 transition-transform duration-700 ease-out group-hover:scale-x-100"
       />
     </li>
+  );
+}
+
+/* ===== Step glyphs — small ambient SVGs ===== */
+
+function SenseGlyph() {
+  const reduce = useReducedMotion();
+  return (
+    <svg viewBox="0 0 120 64" className="h-full w-full" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <motion.circle
+          key={i}
+          cx="60"
+          cy="32"
+          r="6"
+          fill="none"
+          stroke="#B05E76"
+          strokeWidth="0.8"
+          animate={
+            reduce ? undefined : { scale: [1, 3, 1], opacity: [0.6, 0, 0.6] }
+          }
+          transition={
+            reduce
+              ? undefined
+              : { duration: 3, delay: i * 0.9, repeat: Infinity, ease: "easeOut" }
+          }
+          style={{ transformOrigin: "60px 32px" }}
+        />
+      ))}
+      <motion.circle
+        cx="60"
+        cy="32"
+        r="3"
+        fill="#B05E76"
+        animate={reduce ? undefined : { opacity: [0.7, 1, 0.7] }}
+        transition={reduce ? undefined : { duration: 3, repeat: Infinity }}
+      />
+    </svg>
+  );
+}
+
+function PatternGlyph() {
+  const reduce = useReducedMotion();
+  const points = [
+    [20, 40],
+    [40, 18],
+    [60, 36],
+    [80, 22],
+    [100, 38],
+  ];
+  return (
+    <svg viewBox="0 0 120 64" className="h-full w-full" aria-hidden>
+      {/* connecting lines drawn in */}
+      <motion.path
+        d={`M ${points.map(([x, y]) => `${x} ${y}`).join(" L ")}`}
+        fill="none"
+        stroke="#B05E76"
+        strokeWidth="0.8"
+        strokeOpacity="0.6"
+        strokeDasharray="120"
+        animate={reduce ? undefined : { strokeDashoffset: [120, 0, 0, 120] }}
+        transition={
+          reduce
+            ? undefined
+            : { duration: 5, repeat: Infinity, ease: "easeInOut", times: [0, 0.35, 0.65, 1] }
+        }
+      />
+      {points.map(([x, y], i) => (
+        <motion.circle
+          key={i}
+          cx={x}
+          cy={y}
+          r="2.2"
+          fill="#B05E76"
+          animate={reduce ? undefined : { opacity: [0.3, 1, 0.3], scale: [1, 1.3, 1] }}
+          transition={
+            reduce
+              ? undefined
+              : { duration: 3, delay: i * 0.2, repeat: Infinity, ease: "easeInOut" }
+          }
+          style={{ transformOrigin: `${x}px ${y}px` }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function GuidanceGlyph() {
+  const reduce = useReducedMotion();
+  return (
+    <svg viewBox="0 0 120 64" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id="gg-beam" x1="0" x2="1">
+          <stop offset="0%" stopColor="#B05E76" stopOpacity="0" />
+          <stop offset="50%" stopColor="#B05E76" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#B05E76" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line x1="10" x2="110" y1="32" y2="32" stroke="#EFDADC" strokeWidth="1" />
+      <motion.line
+        x1="10"
+        x2="110"
+        y1="32"
+        y2="32"
+        stroke="url(#gg-beam)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeDasharray="40 100"
+        animate={reduce ? undefined : { strokeDashoffset: [140, 0] }}
+        transition={reduce ? undefined : { duration: 4, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.circle
+        cx="60"
+        cy="32"
+        r="2.5"
+        fill="#B05E76"
+        animate={reduce ? undefined : { scale: [1, 1.5, 1], opacity: [0.7, 1, 0.7] }}
+        transition={reduce ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{ transformOrigin: "60px 32px" }}
+      />
+    </svg>
+  );
+}
+
+function SteadinessGlyph() {
+  const reduce = useReducedMotion();
+  const bars = [22, 16, 28, 24, 36, 30, 42, 38];
+  return (
+    <svg viewBox="0 0 120 64" className="h-full w-full" aria-hidden>
+      {bars.map((h, i) => (
+        <motion.rect
+          key={i}
+          x={12 + i * 12}
+          width="3"
+          fill="#B05E76"
+          initial={false}
+          animate={
+            reduce
+              ? { y: 56 - h, height: h, opacity: 0.8 }
+              : { y: [56 - h * 0.4, 56 - h, 56 - h * 0.4], height: [h * 0.4, h, h * 0.4], opacity: [0.5, 0.9, 0.5] }
+          }
+          transition={
+            reduce
+              ? undefined
+              : { duration: 3 + i * 0.1, repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }
+          }
+        />
+      ))}
+    </svg>
   );
 }

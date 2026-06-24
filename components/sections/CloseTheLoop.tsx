@@ -95,6 +95,33 @@ export function CloseTheLoop() {
                   strokeLinecap="round"
                   strokeDasharray="4 5"
                 />
+
+                {/* Data point markers along the body line */}
+                {[
+                  { x: 80, y: 130 },
+                  { x: 200, y: 95 },
+                  { x: 320, y: 65 },
+                  { x: 400, y: 55 },
+                ].map((p, i) => (
+                  <g key={i} className="chart-marker" style={{ animationDelay: `${1.4 + i * 0.25}s` }}>
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r="4"
+                      fill="#B05E76"
+                      opacity="0.95"
+                    />
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r="8"
+                      fill="none"
+                      stroke="#B05E76"
+                      strokeOpacity="0.5"
+                      className="chart-marker-ring"
+                    />
+                  </g>
+                ))}
               </svg>
 
               <div className="mt-6 grid grid-cols-3 gap-4 border-t border-line-soft pt-5 text-[12px]">

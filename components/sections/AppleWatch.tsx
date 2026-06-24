@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
 import { MiniRow } from "@/components/cards/MiniRow";
@@ -58,31 +61,7 @@ export function AppleWatch() {
 
             {/* Watch face mock */}
             <div className="mt-10 flex justify-center">
-              <div
-                className="relative aspect-square w-[230px] rounded-[44px] p-[3px]"
-                style={{
-                  background:
-                    "linear-gradient(160deg, #3a2a2e, #1d1316 60%, #0f0809)",
-                  boxShadow: "0 30px 70px -20px rgba(0,0,0,0.6)",
-                }}
-              >
-                <div
-                  className="relative h-full w-full overflow-hidden rounded-[40px]"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 50% 40%, rgba(242,195,206,0.32), rgba(43,33,34,0.95) 65%)",
-                  }}
-                >
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="h-24 w-24 rounded-full border border-amber-soft/30" />
-                    <div className="absolute h-16 w-16 rounded-full border border-amber-soft/40" />
-                    <div className="absolute h-9 w-9 rounded-full bg-amber-soft/35 blur-[2px]" />
-                    <span className="absolute bottom-7 text-[10px] font-medium uppercase tracking-[0.24em] text-amber-soft/80">
-                      Inhale
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <WatchFace />
             </div>
 
             <p className="mt-10 text-center text-[13px] text-paper/55">
@@ -92,5 +71,135 @@ export function AppleWatch() {
         </div>
       </div>
     </section>
+  );
+}
+
+function WatchFace() {
+  const reduce = useReducedMotion();
+  return (
+    <div
+      className="relative aspect-square w-[230px] rounded-[44px] p-[3px]"
+      style={{
+        background:
+          "linear-gradient(160deg, #3a2a2e, #1d1316 60%, #0f0809)",
+        boxShadow: "0 30px 70px -20px rgba(0,0,0,0.6)",
+      }}
+    >
+      <div
+        className="relative h-full w-full overflow-hidden rounded-[40px]"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 40%, rgba(242,195,206,0.32), rgba(43,33,34,0.95) 65%)",
+        }}
+      >
+        {/* Time-of-day ambient color drift */}
+        <motion.div
+          aria-hidden
+          className="absolute inset-0"
+          animate={
+            reduce
+              ? undefined
+              : {
+                  background: [
+                    "radial-gradient(circle at 50% 40%, rgba(242,195,206,0.32), rgba(43,33,34,0.95) 65%)",
+                    "radial-gradient(circle at 50% 40%, rgba(215,126,145,0.34), rgba(43,33,34,0.95) 65%)",
+                    "radial-gradient(circle at 50% 40%, rgba(229,166,181,0.30), rgba(43,33,34,0.95) 65%)",
+                    "radial-gradient(circle at 50% 40%, rgba(242,195,206,0.32), rgba(43,33,34,0.95) 65%)",
+                  ],
+                }
+          }
+          transition={reduce ? undefined : { duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <svg
+          viewBox="0 0 220 220"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden
+        >
+          {/* 60 dial ticks, hairline */}
+          {Array.from({ length: 60 }).map((_, i) => {
+            const angle = (i * 6) - 90;
+            const rad = (angle * Math.PI) / 180;
+            const r1 = i % 5 === 0 ? 92 : 96;
+            const r2 = 100;
+            const x1 = 110 + Math.cos(rad) * r1;
+            const y1 = 110 + Math.sin(rad) * r1;
+            const x2 = 110 + Math.cos(rad) * r2;
+            const y2 = 110 + Math.sin(rad) * r2;
+            return (
+              <line
+                key={i}
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke="#F2C3CE"
+                strokeOpacity={i % 5 === 0 ? 0.45 : 0.16}
+                strokeWidth={i % 5 === 0 ? 1 : 0.7}
+              />
+            );
+          })}
+
+          {/* Breath ring — outer */}
+          <motion.circle
+            cx="110"
+            cy="110"
+            r="70"
+            fill="none"
+            stroke="#F2C3CE"
+            strokeOpacity="0.5"
+            strokeWidth="1.2"
+            animate={reduce ? undefined : { scale: [1, 1.09, 1], opacity: [0.4, 0.85, 0.4] }}
+            transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformOrigin: "110px 110px" }}
+          />
+
+          {/* Inner breath ring */}
+          <motion.circle
+            cx="110"
+            cy="110"
+            r="48"
+            fill="none"
+            stroke="#F2C3CE"
+            strokeOpacity="0.7"
+            strokeWidth="1"
+            animate={reduce ? undefined : { scale: [1, 1.06, 1], opacity: [0.5, 0.9, 0.5] }}
+            transition={reduce ? undefined : { duration: 8, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+            style={{ transformOrigin: "110px 110px" }}
+          />
+
+          {/* Heartbeat tick line */}
+          <g transform="translate(60 110)">
+            <motion.path
+              d="M 0 0 L 12 0 L 16 -10 L 22 18 L 28 -6 L 32 0 L 100 0"
+              fill="none"
+              stroke="#F2C3CE"
+              strokeWidth="0.9"
+              strokeLinecap="round"
+              strokeOpacity="0.6"
+              strokeDasharray="180"
+              animate={reduce ? undefined : { strokeDashoffset: [180, -180] }}
+              transition={reduce ? undefined : { duration: 4, repeat: Infinity, ease: "linear" }}
+            />
+          </g>
+
+          {/* Pulsing core */}
+          <motion.circle
+            cx="110"
+            cy="110"
+            r="10"
+            fill="#F2C3CE"
+            fillOpacity="0.85"
+            animate={reduce ? undefined : { scale: [1, 0.85, 1.05, 1], opacity: [0.85, 1, 0.9, 0.85] }}
+            transition={reduce ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            style={{ transformOrigin: "110px 110px" }}
+          />
+        </svg>
+
+        <span className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-medium uppercase tracking-[0.24em] text-amber-soft/80">
+          Inhale
+        </span>
+      </div>
+    </div>
   );
 }

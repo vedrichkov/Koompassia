@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { IconCheck, IconArrow } from "@/lib/icons";
+import { IconArrow } from "@/lib/icons";
+import { SpotlightCard } from "@/components/motion/SpotlightCard";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -28,9 +29,13 @@ export function PricingTier({
   const featured = variant === "featured";
 
   return (
-    <article
+    <SpotlightCard
+      spotlightColor={
+        featured ? "rgba(242, 195, 206, 0.18)" : "rgba(215, 126, 145, 0.14)"
+      }
+      radius={460}
       className={cn(
-        "relative flex h-full flex-col overflow-hidden border p-8 transition-all duration-500",
+        "flex h-full flex-col overflow-hidden border p-8 transition-all duration-500",
         featured
           ? "dark-card-lit rounded-[28px] border-bark-deep/40 text-paper md:scale-[1.04] md:-translate-y-3 md:p-10"
           : "rounded-3xl border-line bg-paper text-ink shadow-soft hover:-translate-y-1 hover:shadow-lift",
@@ -83,7 +88,7 @@ export function PricingTier({
         className="relative mt-7 space-y-3 border-t pt-6"
         style={{ borderColor: featured ? "rgba(255,255,255,0.10)" : "var(--line-soft)" }}
       >
-        {features.map((f) => (
+        {features.map((f, i) => (
           <li
             key={f}
             className={cn(
@@ -97,8 +102,12 @@ export function PricingTier({
                 "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
                 featured ? "bg-amber-soft/15 text-amber-soft" : "bg-cream-2/60 text-clay",
               )}
+              style={{ animationDelay: `${i * 0.08}s` }}
             >
-              <IconCheck size={12} />
+              <DrawnCheck
+                color={featured ? "#F2C3CE" : "#B05E76"}
+                delay={i * 0.08}
+              />
             </span>
             <span>{f}</span>
           </li>
@@ -130,6 +139,29 @@ export function PricingTier({
           {footnote}
         </p>
       ) : null}
-    </article>
+    </SpotlightCard>
+  );
+}
+
+/** Checkmark that draws in via CSS stroke-dashoffset on mount. */
+function DrawnCheck({ color, delay = 0 }: { color: string; delay?: number }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path
+        d="M3 8.5l3.2 3L13 4.5"
+        className="drawn-check"
+        style={{ animationDelay: `${delay}s` }}
+      />
+    </svg>
   );
 }

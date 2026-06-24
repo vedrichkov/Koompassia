@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { AppStoreBadge, Button } from "@/components/primitives/Button";
 import { cn } from "@/lib/cn";
 
@@ -19,6 +22,7 @@ export function CTABand({
   secondaryLabel = "Join the waitlist",
   className,
 }: Props) {
+  const reduce = useReducedMotion();
   return (
     <section
       id="get"
@@ -27,8 +31,8 @@ export function CTABand({
         className,
       )}
     >
-      {/* corner glow */}
-      <div
+      {/* Breathing corner glow */}
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute -right-32 -top-32 h-[420px] w-[420px] rounded-full"
         style={{
@@ -36,8 +40,19 @@ export function CTABand({
             "radial-gradient(circle, rgba(242,195,206,0.38), rgba(176,94,118,0.15) 45%, transparent 70%)",
           filter: "blur(28px)",
         }}
+        animate={
+          reduce
+            ? undefined
+            : { scale: [1, 1.12, 1], x: [0, 18, 0], y: [0, -10, 0] }
+        }
+        transition={
+          reduce
+            ? undefined
+            : { duration: 16, repeat: Infinity, ease: "easeInOut" }
+        }
       />
-      <div
+      {/* Drifting bottom-left counter glow */}
+      <motion.div
         aria-hidden
         className="pointer-events-none absolute -bottom-40 -left-24 h-[420px] w-[420px] rounded-full"
         style={{
@@ -45,6 +60,16 @@ export function CTABand({
             "radial-gradient(circle, rgba(215,126,145,0.22), transparent 60%)",
           filter: "blur(36px)",
         }}
+        animate={
+          reduce
+            ? undefined
+            : { scale: [1, 1.08, 1], x: [0, -14, 0], y: [0, 12, 0] }
+        }
+        transition={
+          reduce
+            ? undefined
+            : { duration: 20, repeat: Infinity, ease: "easeInOut" }
+        }
       />
 
       <div className="relative mx-auto max-w-2xl text-center">
