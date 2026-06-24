@@ -136,6 +136,45 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* Direction variants */
+  .reveal-left {
+    animation: reveal-left 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .reveal-right {
+    animation: reveal-right 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes reveal-left {
+    from { opacity: 0; transform: translateX(-22px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes reveal-right {
+    from { opacity: 0; transform: translateX(22px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Per-word staggered reveal (used by WordReveal) */
+  .reveal-word {
+    opacity: 0;
+    transform: translateY(0.5em);
+    animation: reveal-word 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes reveal-word {
+    from { opacity: 0; transform: translateY(0.5em); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Marquee — used by Science section. Pauses on hover. */
+  .marquee {
+    animation: marquee 36s linear infinite;
+  }
+  .marquee-group:hover .marquee {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
   /* SVG path stroke draw-in via CSS — works without JS. */
   .spark-line {
     stroke-dasharray: 360;
@@ -182,4 +221,20 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Lenis sets these classes once mounted; ensures inertia overrides
+   CSS scroll-snap and pointer behaviors */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
 }

@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 type Tag = "div" | "section" | "header" | "article" | "li" | "ul";
+type Direction = "up" | "left" | "right";
 
 type Props = {
   children: ReactNode;
@@ -9,6 +10,8 @@ type Props = {
   delay?: number;
   className?: string;
   as?: Tag;
+  /** Direction the element comes from. Default: up. */
+  from?: Direction;
 };
 
 /**
@@ -16,8 +19,19 @@ type Props = {
  * animation runs and the element ends in its natural state. The element
  * cannot get stuck invisible.
  */
-export function Reveal({ children, delay = 0, className, as = "div" }: Props) {
-  const cls = cn("reveal", className);
+export function Reveal({
+  children,
+  delay = 0,
+  className,
+  as = "div",
+  from = "up",
+}: Props) {
+  const cls = cn(
+    from === "up" && "reveal",
+    from === "left" && "reveal-left",
+    from === "right" && "reveal-right",
+    className,
+  );
   const style: CSSProperties | undefined =
     delay > 0 ? { animationDelay: `${delay}s` } : undefined;
 

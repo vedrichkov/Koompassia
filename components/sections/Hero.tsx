@@ -6,6 +6,7 @@ import { Reveal } from "@/components/primitives/Reveal";
 import { AppStoreBadge, Button } from "@/components/primitives/Button";
 import { Pill } from "@/components/primitives/Pill";
 import { DeviceMockup } from "@/components/device/DeviceMockup";
+import { Magnetic } from "@/components/motion/Magnetic";
 import { IconWatch, IconShield, IconCompass } from "@/lib/icons";
 
 export function Hero() {
@@ -43,11 +44,14 @@ export function Hero() {
             <Eyebrow>Nervous system intelligence</Eyebrow>
           </Reveal>
 
-          <Reveal delay={0.15}>
-            <h1 className="serif mt-5 text-[clamp(36px,6.4vw,76px)] font-medium leading-[1.05] tracking-tighter2 text-balance">
-              Meet the calm <em className="italic">beneath the noise.</em>
-            </h1>
-          </Reveal>
+          <h1 className="serif mt-5 text-[clamp(36px,6.4vw,76px)] font-medium leading-[1.05] tracking-tighter2 text-balance">
+            <WordStagger
+              before="Meet the calm "
+              afterPlain=""
+              italic="beneath the noise."
+              startDelay={0.18}
+            />
+          </h1>
 
           <Reveal delay={0.28}>
             <p className="mt-6 max-w-[36ch] text-[17px] leading-relaxed text-ink-soft text-pretty md:mt-7 md:text-[18px]">
@@ -58,7 +62,9 @@ export function Hero() {
 
           <Reveal delay={0.4}>
             <div className="mt-8 flex flex-wrap items-center gap-3 md:mt-9">
-              <AppStoreBadge />
+              <Magnetic strength={8}>
+                <AppStoreBadge />
+              </Magnetic>
               <Button variant="ghost-light" href="#how">
                 How it works
               </Button>
@@ -74,10 +80,51 @@ export function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.2} className="relative">
+        <Reveal delay={0.2} from="right" className="relative">
           <DeviceMockup parallax />
         </Reveal>
       </div>
     </section>
+  );
+}
+
+function WordStagger({
+  before,
+  italic,
+  afterPlain,
+  startDelay = 0,
+  step = 0.07,
+}: {
+  before: string;
+  italic: string;
+  afterPlain: string;
+  startDelay?: number;
+  step?: number;
+}) {
+  const plain = before.split(/(\s+)/).filter((s) => s.length);
+  const italicWords = italic.split(/(\s+)/).filter((s) => s.length);
+  let i = 0;
+  const renderWords = (tokens: string[], em: boolean) =>
+    tokens.map((tok, k) => {
+      if (/^\s+$/.test(tok)) return <span key={`s-${k}-${tok}`}>{tok}</span>;
+      const delay = startDelay + i * step;
+      i += 1;
+      const node = (
+        <span
+          key={`w-${k}-${tok}`}
+          className="reveal-word inline-block"
+          style={{ animationDelay: `${delay}s` }}
+        >
+          {tok}
+        </span>
+      );
+      return em ? <em className="italic" key={`em-${k}-${tok}`}>{node}</em> : node;
+    });
+  return (
+    <>
+      {renderWords(plain, false)}
+      {renderWords(italicWords, true)}
+      {afterPlain ? <span>{afterPlain}</span> : null}
+    </>
   );
 }

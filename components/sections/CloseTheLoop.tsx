@@ -1,12 +1,13 @@
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
+import { AnimatedNumber } from "@/components/primitives/AnimatedNumber";
 
 export function CloseTheLoop() {
   return (
     <section className="relative py-24 md:py-32">
       <div className="shell">
         <div className="grid items-center gap-12 md:grid-cols-[1fr_1.05fr] md:gap-16">
-          <Reveal as="div">
+          <Reveal as="div" from="left">
             <Eyebrow index="05">Close the loop</Eyebrow>
             <h2 className="serif mt-5 text-[clamp(28px,3.6vw,42px)] font-medium leading-[1.1] tracking-tighter2 text-balance">
               See what is working. <em className="italic">See what is changing.</em>
@@ -25,7 +26,7 @@ export function CloseTheLoop() {
             </div>
           </Reveal>
 
-          <Reveal as="div" delay={0.1}>
+          <Reveal as="div" from="right" delay={0.1}>
             <div className="relative overflow-hidden rounded-3xl border border-line bg-paper p-8 shadow-soft md:p-10">
               {/* faint week grid */}
               <div className="mb-6 flex items-center justify-between">
@@ -101,13 +102,17 @@ export function CloseTheLoop() {
                   <p className="text-ink-faint uppercase tracking-eyebrow text-[10px]">
                     NRS trend
                   </p>
-                  <p className="serif mt-1 text-[20px] tracking-tightish text-ink">+12%</p>
+                  <p className="serif mt-1 text-[20px] tracking-tightish text-ink tabular-nums">
+                    +<AnimatedNumber value={12} duration={1.6} />%
+                  </p>
                 </div>
                 <div>
                   <p className="text-ink-faint uppercase tracking-eyebrow text-[10px]">
                     Steady days
                   </p>
-                  <p className="serif mt-1 text-[20px] tracking-tightish text-ink">18 / 28</p>
+                  <p className="serif mt-1 text-[20px] tracking-tightish text-ink tabular-nums">
+                    <AnimatedNumber value={18} duration={1.6} /> / 28
+                  </p>
                 </div>
                 <div>
                   <p className="text-ink-faint uppercase tracking-eyebrow text-[10px]">

@@ -3,6 +3,8 @@ import { Fraunces, Inter } from "next/font/google";
 import { Nav } from "@/components/chrome/Nav";
 import { Footer } from "@/components/chrome/Footer";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -129,6 +131,8 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <SmoothScroll />
+        <ScrollProgress />
         <Nav />
         <main id="main">{children}</main>
         <Footer />

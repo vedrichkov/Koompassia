@@ -1,6 +1,3 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
 import { Eyebrow } from "@/components/primitives/Eyebrow";
 import { Reveal } from "@/components/primitives/Reveal";
 
@@ -16,7 +13,6 @@ const areas = [
 ];
 
 export function Science() {
-  const reduce = useReducedMotion();
   const loop = [...areas, ...areas];
 
   return (
@@ -35,9 +31,9 @@ export function Science() {
         </Reveal>
       </div>
 
-      {/* Marquee */}
+      {/* Marquee — pure CSS, pauses on hover */}
       <div
-        className="relative mt-16 overflow-hidden py-3"
+        className="marquee-group relative mt-16 overflow-hidden py-3"
         style={{
           maskImage:
             "linear-gradient(90deg, transparent, black 8%, black 92%, transparent)",
@@ -46,25 +42,17 @@ export function Science() {
         }}
         aria-hidden
       >
-        <motion.div
-          className="flex w-max gap-3"
-          animate={reduce ? undefined : { x: ["0%", "-50%"] }}
-          transition={
-            reduce
-              ? undefined
-              : { duration: 36, repeat: Infinity, ease: "linear" }
-          }
-        >
+        <div className="marquee flex w-max gap-3">
           {loop.map((a, i) => (
             <span
               key={`${a}-${i}`}
-              className="inline-flex items-center gap-3 whitespace-nowrap rounded-full border border-line bg-paper/80 px-5 py-2.5 text-[14px] text-ink"
+              className="inline-flex items-center gap-3 whitespace-nowrap rounded-full border border-line bg-paper/80 px-5 py-2.5 text-[14px] text-ink transition-colors duration-300 hover:border-clay/30"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-clay/70" />
               {a}
             </span>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       <div className="shell mt-16">
